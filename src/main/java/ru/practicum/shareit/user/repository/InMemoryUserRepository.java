@@ -15,7 +15,7 @@ public class InMemoryUserRepository implements UserRepository {
     private long nextId = 1;
 
     @Override
-    public Collection<User> findAll(){
+    public Collection<User> findAll() {
         return List.copyOf(users);
     }
 

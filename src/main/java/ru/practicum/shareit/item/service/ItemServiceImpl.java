@@ -31,7 +31,7 @@ public class ItemServiceImpl implements ItemService {
         }
         Collection<ItemDto> items = itemRepository.findAll()
                 .stream()
-                .filter(item -> item.getOwner()!= null
+                .filter(item -> item.getOwner() != null
                                     && item.getOwner().getId().equals(userId))
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
