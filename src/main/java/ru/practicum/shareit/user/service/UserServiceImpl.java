@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto addUser(UserDto userDto) {
+    public UserDto addUser(UserDto userDto) throws DuplicatedDataException {
         log.debug("Запрос на добавление нового пользователя: имя = {}, email = {}", userDto.getName(), userDto.getEmail());
         Optional<User> alreadyExistsUser = repository.findByEmail(userDto.getEmail());
 
@@ -61,17 +62,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(Long id, UserDto newUserDto) {
+    public UserUpdateDto updateUser(Long id, UserUpdateDto newUserDto) {
         log.debug("Отправляем запрос на обновление пользователя с ID {}", id);
-        repository.findUserById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User existingUser = repository.findUserById(id)
+                .orElseThrow(() -> {
+                    log.warn("Пользователь с id #{} не найден", id);
+                    return new NotFoundException("Пользователь не найден");
+                });
 
-        User user = UserMapper.toUser(newUserDto);
-        user.setId(id);
+        if (newUserDto.getEmail() != null && !newUserDto.getEmail().equals(existingUser.getEmail())) {
+            Optional<User> emailOwner = repository.findByEmail(newUserDto.getEmail());
 
-        User updatedUser = repository.save(user);
+            if (emailOwner.isPresent() && emailOwner.get().getEmail().equals(newUserDto.getEmail())) {
+                log.warn("email '{}' пользователя уже используется другим пользователем", newUserDto.getEmail());
+                throw new DuplicatedDataException("Данный email уже используется");
+            }
+        }
 
-        return UserMapper.toUserDto(updatedUser);
+        if (newUserDto.getName() != null) {
+            existingUser.setName(newUserDto.getName());
+        }
+        if (newUserDto.getEmail() != null) {
+            existingUser.setEmail(newUserDto.getEmail());
+        }
+
+        User updatedUser = repository.save(existingUser);
+        log.debug("Пользователь с id = {} успешно обновлен", id);
+
+        return UserMapper.toUserUpdateDto(updatedUser);
     }
 
     @Override
