@@ -4,11 +4,9 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.List;
-
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
-        ItemDto dto = new ItemDto(); // Конструктор без параметров
+        ItemDto dto = new ItemDto();
         dto.setId(item.getId());
         dto.setName(item.getName());
         dto.setDescription(item.getDescription());

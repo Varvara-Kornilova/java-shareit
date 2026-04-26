@@ -15,7 +15,7 @@ public class BookingResponseDto {
     private LocalDateTime end;
     private BookingStatus status;
     private ItemForBookingDto item;
-    private BookieDto booker;
+    private BookerDto booker;
 
     @Data
     @NoArgsConstructor
@@ -28,7 +28,7 @@ public class BookingResponseDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class BookieDto {
+    public static class BookerDto {
         private Long id;
         private String name;
     }

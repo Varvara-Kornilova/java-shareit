@@ -19,7 +19,7 @@ public class BookingMapper {
                 booking.getItem().getId(),
                 booking.getItem().getName()
         );
-        BookingResponseDto.BookieDto booker = new BookingResponseDto.BookieDto(
+        BookingResponseDto.BookerDto booker = new BookingResponseDto.BookerDto(
                 booking.getBooker().getId(),
                 booking.getBooker().getName()
         );
