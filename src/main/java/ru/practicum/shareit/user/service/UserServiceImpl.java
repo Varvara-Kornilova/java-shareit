@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
     @Override
+    @Transactional(readOnly = true)
     public Collection<UserDto> getAllUsers() {
         log.debug("Запрошен список всех пользователей");
         Collection<UserDto> users = repository.findAll()
@@ -34,9 +36,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto getUserById(Long userId) {
         log.debug("Отправляем запрос на получение пользователя по ID {}", userId);
-        User user = repository.findUserById(userId)
+        User user = repository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("Пользователь с id #{} не найден", userId);
                     return new NotFoundException("Пользователь с таким id не найден");
@@ -46,6 +49,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto addUser(UserDto userDto) throws DuplicatedDataException {
         log.debug("Запрос на добавление нового пользователя: имя = {}, email = {}", userDto.getName(), userDto.getEmail());
         Optional<User> alreadyExistsUser = repository.findByEmail(userDto.getEmail());
@@ -62,9 +66,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserUpdateDto updateUser(Long id, UserUpdateDto newUserDto) {
         log.debug("Отправляем запрос на обновление пользователя с ID {}", id);
-        User existingUser = repository.findUserById(id)
+        User existingUser = repository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Пользователь с id #{} не найден", id);
                     return new NotFoundException("Пользователь не найден");
@@ -93,16 +98,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUserById(Long id) {
 
         log.debug("Удаление пользователя с id={}", id);
 
-        if (repository.findUserById(id).isEmpty()) {
+        if (repository.findById(id).isEmpty()) {
             log.warn("Попытка удаления несуществующего пользователя с id={}", id);
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
 
-        repository.delete(id);
+        repository.deleteById(id);
         log.info("Пользователь с id={} успешно удалён", id);
     }
 }

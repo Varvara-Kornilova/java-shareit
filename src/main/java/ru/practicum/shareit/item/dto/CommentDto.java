@@ -1,30 +1,24 @@
-package ru.practicum.shareit.request.dto;
+package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ItemRequestDto {
-    @NotNull
+public class CommentDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
-    @NotBlank(message = "Описание не может быть пустым")
-    private String description;
-
-    @NotNull
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long requestorId;
+    private String text;
 
-    @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String authorName;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime created;
 }
