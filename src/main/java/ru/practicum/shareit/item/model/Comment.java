@@ -1,22 +1,23 @@
 package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
+@NoArgsConstructor
+@ToString(exclude = {"item", "author"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "comments")
 public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false)

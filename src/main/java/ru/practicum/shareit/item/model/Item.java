@@ -5,16 +5,20 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.shareit.user.model.User;
+import lombok.*;
 
 @Getter
 @Setter
-@ToString
+@NoArgsConstructor
+@ToString(exclude = "owner")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "items")
 public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String name;

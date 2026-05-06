@@ -1,9 +1,7 @@
 package ru.practicum.shareit.booking.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -11,13 +9,16 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
+@NoArgsConstructor
+@ToString(exclude = {"item", "booker"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "bookings")
 public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "start_date")
