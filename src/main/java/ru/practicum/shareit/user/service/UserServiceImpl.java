@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,9 +27,9 @@ public class UserServiceImpl implements UserService {
     public Collection<UserDto> getAllUsers() {
         log.debug("Запрошен список всех пользователей");
         Collection<UserDto> users = repository.findAll()
-                        .stream()
-                        .map(UserMapper::toUserDto)
-                        .collect(Collectors.toList());
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
         log.debug("Найдено {} пользователей", users.size());
         return users;
     }
@@ -39,25 +38,18 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto getUserById(Long userId) {
         log.debug("Отправляем запрос на получение пользователя по ID {}", userId);
-        User user = repository.findById(userId)
-                .orElseThrow(() -> {
-                    log.warn("Пользователь с id #{} не найден", userId);
-                    return new NotFoundException("Пользователь с таким id не найден");
-                });
-    log.debug("Пользователь с id #{} найден", userId);
-    return UserMapper.toUserDto(user);
+        User user = findUserByIdOrThrow(userId);
+        log.debug("Пользователь с id #{} найден", userId);
+        return UserMapper.toUserDto(user);
     }
 
     @Override
     @Transactional
     public UserDto addUser(UserDto userDto) throws DuplicatedDataException {
-        log.debug("Запрос на добавление нового пользователя: имя = {}, email = {}", userDto.getName(), userDto.getEmail());
-        Optional<User> alreadyExistsUser = repository.findByEmail(userDto.getEmail());
+        log.debug("Запрос на добавление нового пользователя: имя = {}, email = {}",
+                userDto.getName(), userDto.getEmail());
 
-        if (alreadyExistsUser.isPresent()) {
-            log.warn("email {} уже используется, добавление пользователя невозможно", userDto.getEmail());
-            throw new DuplicatedDataException("Данный email уже используется");
-        }
+        validateEmailIsUnique(userDto.getEmail(), null);
 
         User user = UserMapper.toUser(userDto);
         repository.save(user);
@@ -69,21 +61,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserUpdateDto updateUser(Long id, UserUpdateDto newUserDto) {
         log.debug("Отправляем запрос на обновление пользователя с ID {}", id);
-        User existingUser = repository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Пользователь с id #{} не найден", id);
-                    return new NotFoundException("Пользователь не найден");
-                });
+
+        User existingUser = findUserByIdOrThrow(id);
 
         if (newUserDto.getEmail() != null && !newUserDto.getEmail().equals(existingUser.getEmail())) {
-            Optional<User> emailOwner = repository.findByEmail(newUserDto.getEmail());
-
-            if (emailOwner.isPresent() && emailOwner.get().getEmail().equals(newUserDto.getEmail())) {
-                log.warn("email '{}' пользователя уже используется другим пользователем", newUserDto.getEmail());
-                throw new DuplicatedDataException("Данный email уже используется");
-            }
+            validateEmailIsUnique(newUserDto.getEmail(), id);
         }
-
         if (newUserDto.getName() != null) {
             existingUser.setName(newUserDto.getName());
         }
@@ -100,15 +83,32 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUserById(Long id) {
-
         log.debug("Удаление пользователя с id={}", id);
 
-        if (repository.findById(id).isEmpty()) {
-            log.warn("Попытка удаления несуществующего пользователя с id={}", id);
-            throw new NotFoundException("Пользователь с id = " + id + " не найден");
-        }
+        findUserByIdOrThrow(id);
 
         repository.deleteById(id);
         log.info("Пользователь с id={} успешно удалён", id);
+    }
+
+    private User findUserByIdOrThrow(Long userId) {
+        return repository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("Пользователь с id #{} не найден", userId);
+                    return new NotFoundException("Пользователь с таким id не найден");
+                });
+    }
+
+    private void validateEmailIsUnique(String email, Long excludeUserId) {
+        Optional<User> existingUser = repository.findByEmail(email);
+
+        if (existingUser.isPresent()) {
+            if (excludeUserId != null && existingUser.get().getId().equals(excludeUserId)) {
+                return;
+            }
+
+            log.warn("email {} уже используется, операция невозможна", email);
+            throw new DuplicatedDataException("Данный email уже используется");
+        }
     }
 }

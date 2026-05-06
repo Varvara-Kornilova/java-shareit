@@ -18,6 +18,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.validation.BookingValidator;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -31,83 +32,55 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BookingValidator bookingValidator;
+    private final BookingMapper bookingMapper;
+
 
     @Override
     @Transactional
     public BookingResponseDto createBooking(Long bookerId, BookingCreateDto dto) {
-        log.debug("Создание бронирования: userId={}, itemId={}, start={}, end={}",
-                bookerId, dto.getItemId(), dto.getStart(), dto.getEnd());
+        log.debug("Создание бронирования: userId={}, itemId={}", bookerId, dto.getItemId());
 
-        User booker = userRepository.findById(bookerId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id=" + bookerId + " не найден"));
+        bookingValidator.validateCreateBooking(bookerId, dto);
 
         Item item = itemRepository.findById(dto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Вещь с id=" + dto.getItemId() + " не найдена"));
+        User booker = userRepository.findById(bookerId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id=" + bookerId + " не найден"));
 
-        if (item.getOwner().getId().equals(bookerId)) {
-            throw new NotFoundException("Нельзя забронировать свою вещь");
-        }
-
-        if (!item.getAvailable()) {
-            throw new ValidationException("Вещь недоступна для бронирования");
-        }
-
-        if (dto.getStart().isAfter(dto.getEnd()) || dto.getStart().isEqual(dto.getEnd())) {
-            throw new ValidationException("Некорректные даты бронирования: start должен быть раньше end");
-        }
-        if (dto.getStart().isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Нельзя создать бронирование в прошлом");
-        }
-
-        Booking booking = BookingMapper.toBooking(dto);
+        Booking booking = bookingMapper.toBooking(dto);
         booking.setItem(item);
         booking.setBooker(booker);
-        booking.setStatus(BookingStatus.WAITING); // По умолчанию
+        booking.setStatus(BookingStatus.WAITING);
 
         Booking saved = bookingRepository.save(booking);
         log.info("Бронирование создано: id={}", saved.getId());
-        return BookingMapper.toBookingResponseDto(saved);
+        return bookingMapper.toBookingResponseDto(saved);
     }
 
     @Override
     @Transactional
     public BookingResponseDto updateBookingStatus(Long bookingId, Long ownerId, Boolean approved) {
-        log.debug("Обновление статуса бронирования: bookingId={}, ownerId={}, approved={}",
-                bookingId, ownerId, approved);
+        log.debug("Обновление статуса: bookingId={}", bookingId);
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Бронирование с id=" + bookingId + " не найдено"));
+                .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
 
-        if (!booking.getItem().getOwner().getId().equals(ownerId)) {
-            throw new AccessDeniedException("Только владелец вещи может подтвердить или отклонить бронирование");
-        }
-
-        if (booking.getStatus() != BookingStatus.WAITING) {
-            throw new ValidationException("Статус бронирования можно изменить только когда он WAITING");
-        }
+        bookingValidator.validateUpdateStatus(booking, ownerId);
 
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        Booking updated = bookingRepository.save(booking);
-        log.info("Статус бронирования обновлён: id={}, status={}", bookingId, booking.getStatus());
-        return BookingMapper.toBookingResponseDto(updated);
+        return bookingMapper.toBookingResponseDto(bookingRepository.save(booking));
     }
 
     @Override
     @Transactional(readOnly = true)
     public BookingResponseDto getBookingById(Long bookingId, Long userId) {
-        log.debug("Получение бронирования: bookingId={}, userId={}", bookingId, userId);
-
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Бронирование с id=" + bookingId + " не найдено"));
+                .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
 
-        boolean isBooker = booking.getBooker().getId().equals(userId);
-        boolean isOwner = booking.getItem().getOwner().getId().equals(userId);
+        bookingValidator.validateAccess(booking, userId);
 
-        if (!isBooker && !isOwner) {
-            throw new NotFoundException("Доступ запрещён: вы не являетесь автором бронирования или владельцем вещи");
-        }
-
-        return BookingMapper.toBookingResponseDto(booking);
+        return bookingMapper.toBookingResponseDto(booking);
     }
 
     @Override

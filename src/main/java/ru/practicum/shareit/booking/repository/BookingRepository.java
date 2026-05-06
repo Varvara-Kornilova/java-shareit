@@ -56,6 +56,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                    @Param("itemId") Long itemId,
                                    @Param("now") LocalDateTime now);
 
+    @Query("SELECT COUNT(b) > 0 FROM Booking b " +
+            "WHERE b.booker.id = :bookerId " +
+            "AND b.item.id = :itemId " +
+            "AND b.end < :end " +
+            "AND b.status = :status")
+    boolean existsByBookerIdAndItemIdAndEndBeforeAndStatus(@Param("bookerId") Long bookerId,
+                                                           @Param("itemId") Long itemId,
+                                                           @Param("end") LocalDateTime end,
+                                                           @Param("status") BookingStatus status);
+
     default List<Booking> findByBookerIdAndState(Long bookerId, BookingState state, LocalDateTime now) {
         return switch (state) {
             case ALL -> findByBookerIdOrderByStartDesc(bookerId);
