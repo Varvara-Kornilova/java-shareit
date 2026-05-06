@@ -21,7 +21,6 @@ import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.validation.ItemValidator;
 import ru.practicum.shareit.validation.ValidationUtils;
 
 import java.time.LocalDateTime;
@@ -37,7 +36,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
-    private final ValidationUtils validationUtils; // для проверок существования сущностей
+    private final ValidationUtils validationUtils;
 
     @Override
     @Transactional(readOnly = true)
