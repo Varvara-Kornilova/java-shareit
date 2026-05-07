@@ -4,13 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
+import java.util.ArrayList;
+import java.util.List;
 
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class ItemDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
@@ -26,6 +29,8 @@ public class ItemDto {
     @NotNull(message = "Статус не может быть неопределен")
     private Boolean available;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long requestId;
+    private BookingItemDto lastBooking;
+    private BookingItemDto nextBooking;
+
+    private List<CommentDto> comments = new ArrayList<>();
 }
