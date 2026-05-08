@@ -1,14 +1,20 @@
 package ru.practicum.shareit.request.mapper;
 
-import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemForRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 
+import java.util.List;
+import java.util.Collections;
+
 public class ItemRequestMapper {
-    public static ItemRequestDto toItemRequestDto(ItemRequest request) {
-        return new ItemRequestDto(
+
+    public static ItemRequestResponseDto toResponseDto(ItemRequest request, List<ItemForRequestDto> items) {
+        return new ItemRequestResponseDto(
                 request.getId(),
                 request.getDescription(),
-                request.getRequestor().getId(),
-                request.getCreated());
+                request.getCreated(),
+                items != null ? items : Collections.emptyList()
+        );
     }
 }
