@@ -43,4 +43,10 @@ public class ErrorHandler {
     public Map<String, String> handleValidation(ValidationException e) {
         return Map.of("error", e.getMessage());
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleIllegalArgument(IllegalArgumentException e) {
+        return Map.of("error", e.getMessage());
+    }
 }

@@ -98,10 +98,8 @@ class BookingServiceIntegrationTest {
                 LocalDateTime.now().plusDays(11));
         bookingService.createBooking(booker.getId(), futureDto);
 
-        // ✅ Передаём from=0, size=10
         var futureBookings = bookingService.getAllBookingsByBooker(booker.getId(), BookingState.FUTURE, 0, 10);
 
-        // ✅ Collection имеет метод isEmpty()
         assertFalse(futureBookings.isEmpty());
     }
 }

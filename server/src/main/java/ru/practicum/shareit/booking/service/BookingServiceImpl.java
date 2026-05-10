@@ -77,11 +77,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public BookingResponseDto getBooking(Long userId, Long bookingId) {
-        // Сначала ищем бронирование
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
 
-        // Потом проверяем права: доступ есть у бронировщика ИЛИ владельца вещи
         boolean isBooker = booking.getBooker().getId().equals(userId);
         boolean isOwner = booking.getItem().getOwner().getId().equals(userId);
 
@@ -105,7 +103,6 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime now = LocalDateTime.now();
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
 
-        // ✅ Передаём state.name() вместо state
         List<Booking> bookings = bookingRepository.findByBookerIdAndState(
                 bookerId,
                 state.name(),
