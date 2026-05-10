@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.BookingState;
+import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -101,5 +102,138 @@ class BookingServiceIntegrationTest {
         var futureBookings = bookingService.getAllBookingsByBooker(booker.getId(), BookingState.FUTURE, 0, 10);
 
         assertFalse(futureBookings.isEmpty());
+    }
+
+    @Test
+    void updateBookingStatus_Reject_Success() {
+        UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
+        UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
+
+        ItemDto item = itemService.addItem(owner.getId(),
+                new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), null));
+
+        BookingCreateDto createDto = new BookingCreateDto(
+                item.getId(),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2));
+
+        BookingResponseDto booking = bookingService.createBooking(booker.getId(), createDto);
+
+        BookingResponseDto rejected = bookingService.updateBookingStatus(booking.getId(), owner.getId(), false);
+
+        assertEquals("REJECTED", rejected.getStatus().name());
+    }
+
+    @Test
+    void getBooking_AsBooker_Success() {
+        UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
+        UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
+
+        ItemDto item = itemService.addItem(owner.getId(),
+                new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), null));
+
+        BookingCreateDto createDto = new BookingCreateDto(
+                item.getId(),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2));
+
+        BookingResponseDto created = bookingService.createBooking(booker.getId(), createDto);
+
+        BookingResponseDto found = bookingService.getBooking(booker.getId(), created.getId());
+
+        assertEquals(created.getId(), found.getId());
+        assertEquals(booker.getId(), found.getBooker().getId());
+    }
+
+    @Test
+    void getBooking_AsOwner_Success() {
+        UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
+        UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
+
+        ItemDto item = itemService.addItem(owner.getId(),
+                new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), null));
+
+        BookingCreateDto createDto = new BookingCreateDto(
+                item.getId(),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2));
+
+        BookingResponseDto created = bookingService.createBooking(booker.getId(), createDto);
+
+        BookingResponseDto found = bookingService.getBooking(owner.getId(), created.getId());
+
+        assertEquals(created.getId(), found.getId());
+    }
+
+    @Test
+    void getBooking_AsThirdParty_ThrowsAccessDenied() {
+        UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
+        UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
+        UserDto thirdParty = userService.addUser(new UserDto(null, "Third", "third@test.com"));
+
+        ItemDto item = itemService.addItem(owner.getId(),
+                new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), null));
+
+        BookingCreateDto createDto = new BookingCreateDto(
+                item.getId(),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2));
+
+        BookingResponseDto created = bookingService.createBooking(booker.getId(), createDto);
+
+        assertThrows(AccessDeniedException.class, () ->
+                bookingService.getBooking(thirdParty.getId(), created.getId()));
+    }
+
+    @Test
+    void getAllBookingsByBooker_UserNotFound_ThrowsException() {
+        assertThrows(NotFoundException.class, () ->
+                bookingService.getAllBookingsByBooker(999L, BookingState.ALL, 0, 10));
+    }
+
+    @Test
+    void getAllBookingsByOwner_UserNotFound_ThrowsException() {
+        // Покрываем ветку: userRepository.findById(ownerId).isEmpty() → NotFoundException
+        assertThrows(NotFoundException.class, () ->
+                bookingService.getAllBookingsByOwner(999L, BookingState.ALL, 0, 10));
+    }
+
+    @Test
+    void getAllBookingsByBooker_WithFutureState() {
+        UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
+        UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
+
+        ItemDto item = itemService.addItem(owner.getId(),
+                new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), null));
+
+        BookingCreateDto futureDto = new BookingCreateDto(
+                item.getId(),
+                LocalDateTime.now().plusDays(10),
+                LocalDateTime.now().plusDays(11));
+        bookingService.createBooking(booker.getId(), futureDto);
+
+        var futureBookings = bookingService.getAllBookingsByBooker(booker.getId(), BookingState.FUTURE, 0, 10);
+
+        assertFalse(futureBookings.isEmpty());
+        assertEquals(1, futureBookings.size());
+    }
+
+    @Test
+    void getAllBookingsByOwner_WithAllStates() {
+        UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
+        UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
+
+        ItemDto item = itemService.addItem(owner.getId(),
+                new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), null));
+
+        BookingCreateDto createDto = new BookingCreateDto(
+                item.getId(),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2));
+        bookingService.createBooking(booker.getId(), createDto);
+
+        var bookings = bookingService.getAllBookingsByOwner(owner.getId(), BookingState.ALL, 0, 10);
+
+        assertFalse(bookings.isEmpty());
     }
 }
