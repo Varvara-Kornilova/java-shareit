@@ -269,4 +269,298 @@ class BookingRepositoryTest {
         booking.setStatus(status);
         return booking;
     }
+
+    // ==================== Тесты для состояния REJECTED ====================
+
+    @Test
+    void findByBookerIdAndState_Rejected_ReturnsOnlyRejectedBookings() {
+        Booking rejected = createBooking(booker, item,
+                now.plusDays(5), now.plusDays(10), BookingStatus.REJECTED);
+        Booking approved = createBooking(booker, item,
+                now.plusDays(15), now.plusDays(20), BookingStatus.APPROVED);
+        bookingRepository.saveAll(List.of(rejected, approved));
+
+        List<Booking> result = bookingRepository.findByBookerIdAndState(
+                booker.getId(), BookingState.REJECTED, now);
+
+        assertEquals(1, result.size());
+        assertEquals(rejected.getId(), result.get(0).getId());
+        assertEquals(BookingStatus.REJECTED, result.get(0).getStatus());
+    }
+
+// ==================== Тесты для пустых результатов ====================
+
+    @Test
+    void findByBookerIdAndState_All_ReturnsEmpty_WhenNoBookings() {
+        List<Booking> result = bookingRepository.findByBookerIdAndState(
+                booker.getId(), BookingState.ALL, now);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void findByBookerIdAndState_Past_ReturnsEmpty_WhenNoPastBookings() {
+        Booking future = createBooking(booker, item,
+                now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
+        bookingRepository.save(future);
+
+        List<Booking> result = bookingRepository.findByBookerIdAndState(
+                booker.getId(), BookingState.PAST, now);
+        assertTrue(result.isEmpty());
+    }
+
+// ==================== Тесты для findByOwnerIdAndState (все состояния) ====================
+
+    @Test
+    void findByOwnerIdAndState_Past_ReturnsBookingsForOwnerItems() {
+        Booking past = createBooking(booker, item,
+                now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
+        bookingRepository.save(past);
+
+        List<Booking> result = bookingRepository.findByOwnerIdAndState(
+                owner.getId(), BookingState.PAST, now);
+
+        assertEquals(1, result.size());
+        assertEquals(past.getId(), result.get(0).getId());
+    }
+
+    @Test
+    void findByOwnerIdAndState_Current_ReturnsBookingsForOwnerItems() {
+        Booking current = createBooking(booker, item,
+                now.minusDays(2), now.plusDays(2), BookingStatus.APPROVED);
+        bookingRepository.save(current);
+
+        List<Booking> result = bookingRepository.findByOwnerIdAndState(
+                owner.getId(), BookingState.CURRENT, now);
+
+        assertEquals(1, result.size());
+        assertEquals(current.getId(), result.get(0).getId());
+    }
+
+    @Test
+    void findByOwnerIdAndState_All_ReturnsAllBookingsForOwner() {
+        Booking past = createBooking(booker, item,
+                now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
+        Booking future = createBooking(booker, item,
+                now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
+        bookingRepository.saveAll(List.of(past, future));
+
+        List<Booking> result = bookingRepository.findByOwnerIdAndState(
+                owner.getId(), BookingState.ALL, now);
+
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void findByOwnerIdAndState_Waiting_ReturnsOnlyWaitingBookings() {
+        Booking waiting = createBooking(booker, item,
+                now.plusDays(5), now.plusDays(10), BookingStatus.WAITING);
+        Booking approved = createBooking(booker, item,
+                now.plusDays(15), now.plusDays(20), BookingStatus.APPROVED);
+        bookingRepository.saveAll(List.of(waiting, approved));
+
+        List<Booking> result = bookingRepository.findByOwnerIdAndState(
+                owner.getId(), BookingState.WAITING, now);
+
+        assertEquals(1, result.size());
+        assertEquals(waiting.getId(), result.get(0).getId());
+    }
+
+    @Test
+    void findByOwnerIdAndState_Rejected_ReturnsOnlyRejectedBookings() {
+        Booking rejected = createBooking(booker, item,
+                now.plusDays(5), now.plusDays(10), BookingStatus.REJECTED);
+        bookingRepository.save(rejected);
+
+        List<Booking> result = bookingRepository.findByOwnerIdAndState(
+                owner.getId(), BookingState.REJECTED, now);
+
+        assertEquals(1, result.size());
+        assertEquals(rejected.getId(), result.get(0).getId());
+    }
+
+    @Test
+    void findByOwnerIdAndState_All_ReturnsEmpty_WhenNoBookingsForOwner() {
+        // Создаём вещь другого владельца
+        User anotherOwner = new User();
+        anotherOwner.setEmail("another@test.com");
+        anotherOwner.setName("Another");
+        anotherOwner = userRepository.save(anotherOwner);
+
+        Item anotherItem = new Item();
+        anotherItem.setName("Another Item");
+        anotherItem.setDescription("Another");
+        anotherItem.setAvailable(true);
+        anotherItem.setOwner(anotherOwner);
+        anotherItem = itemRepository.save(anotherItem);
+
+        Booking booking = createBooking(booker, anotherItem,
+                now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
+        bookingRepository.save(booking);
+
+        List<Booking> result = bookingRepository.findByOwnerIdAndState(
+                owner.getId(), BookingState.ALL, now);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void findByBookerIdAndState_WithPageable_ReturnsLimitedResults() {
+        for (int i = 0; i < 5; i++) {
+            Booking booking = createBooking(booker, item,
+                    now.plusDays(i), now.plusDays(i + 2), BookingStatus.APPROVED);
+            bookingRepository.save(booking);
+        }
+
+        List<Booking> result = bookingRepository.findByBookerIdAndState(
+                booker.getId(), "ALL", now,
+                org.springframework.data.domain.PageRequest.of(0, 2));
+
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void findByOwnerIdAndState_WithPageable_ReturnsLimitedResults() {
+        for (int i = 0; i < 5; i++) {
+            Booking booking = createBooking(booker, item,
+                    now.plusDays(i), now.plusDays(i + 2), BookingStatus.APPROVED);
+            bookingRepository.save(booking);
+        }
+
+        List<Booking> result = bookingRepository.findByOwnerIdAndState(
+                owner.getId(), "ALL", now,
+                org.springframework.data.domain.PageRequest.of(0, 3));
+
+        assertEquals(3, result.size());
+    }
+
+    @Test
+    void hasApprovedPastBooking_ReturnsFalse_WhenNoBookingsAtAll() {
+        boolean result = bookingRepository.hasApprovedPastBooking(
+                999L, 999L, now);
+        assertFalse(result);
+    }
+
+    @Test
+    void hasApprovedPastBooking_ReturnsFalse_WhenBookingEndsExactlyAtNow() {
+        LocalDateTime fixedNow = LocalDateTime.of(2024, 6, 1, 12, 0, 0);
+
+        Booking booking = createBooking(booker, item,
+                fixedNow.minusDays(10), fixedNow, BookingStatus.APPROVED);
+        bookingRepository.save(booking);
+
+        boolean result = bookingRepository.hasApprovedPastBooking(
+                booker.getId(), item.getId(), fixedNow);
+
+        assertFalse(result, "Бронирование с end == now не считается прошедшим");
+    }
+
+    @Test
+    void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsFalse_WhenEndEqualsParameter() {
+        LocalDateTime fixedNow = LocalDateTime.of(2024, 6, 1, 12, 0, 0);
+
+        Booking booking = createBooking(booker, item,
+                fixedNow.minusDays(10), fixedNow, BookingStatus.APPROVED);
+        bookingRepository.save(booking);
+
+        boolean exists = bookingRepository.existsByBookerIdAndItemIdAndEndBeforeAndStatus(
+                booker.getId(), item.getId(), fixedNow, BookingStatus.APPROVED);
+
+        assertFalse(exists, "Бронирование с end == параметру не удовлетворяет условию end < параметр");
+    }
+
+    @Test
+    void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsFalse_WhenNoBookingsAtAll() {
+        boolean exists = bookingRepository.existsByBookerIdAndItemIdAndEndBeforeAndStatus(
+                999L, 999L, now, BookingStatus.APPROVED);
+        assertFalse(exists);
+    }
+
+    @Test
+    void findCurrentByBookerId_ReturnsCurrentBookings() {
+        Booking current = createBooking(booker, item,
+                now.minusDays(2), now.plusDays(2), BookingStatus.APPROVED);
+        Booking past = createBooking(booker, item,
+                now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
+        bookingRepository.saveAll(List.of(current, past));
+
+        List<Booking> result = bookingRepository.findCurrentByBookerId(booker.getId(), now);
+
+        assertEquals(1, result.size());
+        assertEquals(current.getId(), result.get(0).getId());
+    }
+
+    @Test
+    void findCurrentByOwnerId_ReturnsCurrentBookings() {
+        Booking current = createBooking(booker, item,
+                now.minusDays(2), now.plusDays(2), BookingStatus.APPROVED);
+        bookingRepository.save(current);
+
+        List<Booking> result = bookingRepository.findCurrentByOwnerId(owner.getId(), now);
+
+        assertEquals(1, result.size());
+        assertEquals(current.getId(), result.get(0).getId());
+    }
+
+    @Test
+    void findCurrentByBookerId_ReturnsEmpty_WhenNoCurrentBookings() {
+        Booking past = createBooking(booker, item,
+                now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
+        Booking future = createBooking(booker, item,
+                now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
+        bookingRepository.saveAll(List.of(past, future));
+
+        List<Booking> result = bookingRepository.findCurrentByBookerId(booker.getId(), now);
+
+        assertTrue(result.isEmpty());
+    }
+
+
+    @Test
+    void findPastByBookerId_ReturnsPastBookings() {
+        Booking past = createBooking(booker, item,
+                now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
+        bookingRepository.save(past);
+
+        List<Booking> result = bookingRepository.findPastByBookerId(booker.getId(), now);
+
+        assertEquals(1, result.size());
+        assertEquals(past.getId(), result.get(0).getId());
+    }
+
+    @Test
+    void findPastByOwnerId_ReturnsPastBookings() {
+        Booking past = createBooking(booker, item,
+                now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
+        bookingRepository.save(past);
+
+        List<Booking> result = bookingRepository.findPastByOwnerId(owner.getId(), now);
+
+        assertEquals(1, result.size());
+        assertEquals(past.getId(), result.get(0).getId());
+    }
+
+
+    @Test
+    void findFutureByBookerId_ReturnsFutureBookings() {
+        Booking future = createBooking(booker, item,
+                now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
+        bookingRepository.save(future);
+
+        List<Booking> result = bookingRepository.findFutureByBookerId(booker.getId(), now);
+
+        assertEquals(1, result.size());
+        assertEquals(future.getId(), result.get(0).getId());
+    }
+
+    @Test
+    void findFutureByOwnerId_ReturnsFutureBookings() {
+        Booking future = createBooking(booker, item,
+                now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
+        bookingRepository.save(future);
+
+        List<Booking> result = bookingRepository.findFutureByOwnerId(owner.getId(), now);
+
+        assertEquals(1, result.size());
+        assertEquals(future.getId(), result.get(0).getId());
+    }
 }

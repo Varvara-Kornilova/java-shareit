@@ -28,7 +28,6 @@ class UserServiceUnitTest {
 
     @Test
     void updateUser_OnlyNameChanged_EmailUnchanged() {
-        // Проверяем ветку: обновляем только name, email = null → email не меняется
         User existing = new User();
         existing.setId(1L);
         existing.setName("Old Name");
