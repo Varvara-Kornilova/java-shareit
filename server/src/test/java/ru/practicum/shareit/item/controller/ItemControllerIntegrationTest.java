@@ -36,38 +36,38 @@ class ItemControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final long USER_ID = 1L;
-    private final long ITEM_ID = 10L;
+    private final long user_id = 1L;
+    private final long item_id = 10L;
 
     @Test
     void getAllItems_Success() throws Exception {
-        when(itemService.getAllItems(eq(USER_ID)))
+        when(itemService.getAllItems(eq(user_id)))
                 .thenReturn(List.of());
 
         mockMvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", USER_ID))
+                        .header("X-Sharer-User-Id", user_id))
                 .andExpect(status().isOk());
 
-        verify(itemService).getAllItems(eq(USER_ID));
+        verify(itemService).getAllItems(eq(user_id));
     }
 
     @Test
     void getItemById_Success() throws Exception {
-        ItemDto item = new ItemDto(ITEM_ID, "Дрель", "Профессиональная", true, null, null, List.of(), null);
-        when(itemService.getItem(eq(ITEM_ID))).thenReturn(item);
+        ItemDto item = new ItemDto(item_id, "Дрель", "Профессиональная", true, null, null, List.of(), null);
+        when(itemService.getItem(eq(item_id))).thenReturn(item);
 
-        mockMvc.perform(get("/items/{itemId}", ITEM_ID))
+        mockMvc.perform(get("/items/{itemId}", item_id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(ITEM_ID))
+                .andExpect(jsonPath("$.id").value(item_id))
                 .andExpect(jsonPath("$.name").value("Дрель"));
     }
 
     @Test
     void getItemById_NotFound_ThrowsException() throws Exception {
-        when(itemService.getItem(eq(ITEM_ID)))
+        when(itemService.getItem(eq(item_id)))
                 .thenThrow(new NotFoundException("Вещь не найдена"));
 
-        mockMvc.perform(get("/items/{itemId}", ITEM_ID))
+        mockMvc.perform(get("/items/{itemId}", item_id))
                 .andExpect(status().isNotFound());
     }
 
@@ -101,31 +101,31 @@ class ItemControllerIntegrationTest {
     @Test
     void addItem_Success() throws Exception {
         ItemDto newItem = new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), null);
-        ItemDto created = new ItemDto(ITEM_ID, "Дрель", "Профессиональная", true, null, null, List.of(), null);
+        ItemDto created = new ItemDto(item_id, "Дрель", "Профессиональная", true, null, null, List.of(), null);
 
-        when(itemService.addItem(eq(USER_ID), any(ItemDto.class)))
+        when(itemService.addItem(eq(user_id), any(ItemDto.class)))
                 .thenReturn(created);
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", USER_ID)
+                        .header("X-Sharer-User-Id", user_id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newItem)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(ITEM_ID));
+                .andExpect(jsonPath("$.id").value(item_id));
 
-        verify(itemService).addItem(eq(USER_ID), any(ItemDto.class));
+        verify(itemService).addItem(eq(user_id), any(ItemDto.class));
     }
 
     @Test
     void updateItem_Success() throws Exception {
-        ItemUpdateDto updateDto = new ItemUpdateDto(ITEM_ID, "Новое название", "Новое описание", false);
-        ItemDto updated = new ItemDto(ITEM_ID, "Новое название", "Новое описание", false, null, null, List.of(), null);
+        ItemUpdateDto updateDto = new ItemUpdateDto(item_id, "Новое название", "Новое описание", false);
+        ItemDto updated = new ItemDto(item_id, "Новое название", "Новое описание", false, null, null, List.of(), null);
 
-        when(itemService.updateItem(eq(USER_ID), eq(ITEM_ID), any(ItemUpdateDto.class)))
+        when(itemService.updateItem(eq(user_id), eq(item_id), any(ItemUpdateDto.class)))
                 .thenReturn(updated);
 
-        mockMvc.perform(patch("/items/{itemId}", ITEM_ID)
-                        .header("X-Sharer-User-Id", USER_ID)
+        mockMvc.perform(patch("/items/{itemId}", item_id)
+                        .header("X-Sharer-User-Id", user_id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
@@ -134,13 +134,13 @@ class ItemControllerIntegrationTest {
 
     @Test
     void updateItem_AccessDenied_ThrowsException() throws Exception {
-        ItemUpdateDto updateDto = new ItemUpdateDto(ITEM_ID, "Новое название", "Описание", true);
+        ItemUpdateDto updateDto = new ItemUpdateDto(item_id, "Новое название", "Описание", true);
 
-        when(itemService.updateItem(eq(USER_ID), eq(ITEM_ID), any(ItemUpdateDto.class)))
+        when(itemService.updateItem(eq(user_id), eq(item_id), any(ItemUpdateDto.class)))
                 .thenThrow(new AccessDeniedException("Только владелец может редактировать"));
 
-        mockMvc.perform(patch("/items/{itemId}", ITEM_ID)
-                        .header("X-Sharer-User-Id", USER_ID)
+        mockMvc.perform(patch("/items/{itemId}", item_id)
+                        .header("X-Sharer-User-Id", user_id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isForbidden());
@@ -148,13 +148,13 @@ class ItemControllerIntegrationTest {
 
     @Test
     void deleteItem_Success() throws Exception {
-        doNothing().when(itemService).deleteItem(eq(USER_ID), eq(ITEM_ID));
+        doNothing().when(itemService).deleteItem(eq(user_id), eq(item_id));
 
-        mockMvc.perform(delete("/items/{itemId}", ITEM_ID)
-                        .header("X-Sharer-User-Id", USER_ID))
+        mockMvc.perform(delete("/items/{itemId}", item_id)
+                        .header("X-Sharer-User-Id", user_id))
                 .andExpect(status().isNoContent());
 
-        verify(itemService).deleteItem(eq(USER_ID), eq(ITEM_ID));
+        verify(itemService).deleteItem(eq(user_id), eq(item_id));
     }
 
     @Test
@@ -162,11 +162,11 @@ class ItemControllerIntegrationTest {
         CommentCreateDto commentDto = new CommentCreateDto("Отличный товар!");
         CommentDto comment = new CommentDto(1L, "Отличный товар!", "User", null);
 
-        when(itemService.addComment(eq(USER_ID), eq(ITEM_ID), any(CommentCreateDto.class)))
+        when(itemService.addComment(eq(user_id), eq(item_id), any(CommentCreateDto.class)))
                 .thenReturn(comment);
 
-        mockMvc.perform(post("/items/{itemId}/comment", ITEM_ID)
-                        .header("X-Sharer-User-Id", USER_ID)
+        mockMvc.perform(post("/items/{itemId}/comment", item_id)
+                        .header("X-Sharer-User-Id", user_id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentDto)))
                 .andExpect(status().isOk())
@@ -177,11 +177,11 @@ class ItemControllerIntegrationTest {
     void addComment_ValidationFailed_ThrowsException() throws Exception {
         CommentCreateDto commentDto = new CommentCreateDto("Отличный товар!");
 
-        when(itemService.addComment(eq(USER_ID), eq(ITEM_ID), any(CommentCreateDto.class)))
+        when(itemService.addComment(eq(user_id), eq(item_id), any(CommentCreateDto.class)))
                 .thenThrow(new ValidationException("Нельзя оставить комментарий"));
 
-        mockMvc.perform(post("/items/{itemId}/comment", ITEM_ID)
-                        .header("X-Sharer-User-Id", USER_ID)
+        mockMvc.perform(post("/items/{itemId}/comment", item_id)
+                        .header("X-Sharer-User-Id", user_id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentDto)))
                 .andExpect(status().isBadRequest());
@@ -189,10 +189,10 @@ class ItemControllerIntegrationTest {
 
     @Test
     void getComments_Success() throws Exception {
-        when(itemService.getComments(eq(ITEM_ID)))
+        when(itemService.getComments(eq(item_id)))
                 .thenReturn(List.of(new CommentDto(1L, "Коммент", "User", null)));
 
-        mockMvc.perform(get("/items/{itemId}/comments", ITEM_ID))
+        mockMvc.perform(get("/items/{itemId}/comments", item_id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].text").value("Коммент"));
     }

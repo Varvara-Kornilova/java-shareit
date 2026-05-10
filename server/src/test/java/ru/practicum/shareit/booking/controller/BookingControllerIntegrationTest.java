@@ -38,45 +38,45 @@ class BookingControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final long USER_ID = 1L;
-    private final long BOOKING_ID = 10L;
-    private final long ITEM_ID = 100L;
+    private final long user_id = 1L;
+    private final long booking_id = 10L;
+    private final long item_id = 100L;
 
     @Test
     void createBooking_Success() throws Exception {
-        BookingCreateDto request = new BookingCreateDto(ITEM_ID,
+        BookingCreateDto request = new BookingCreateDto(item_id,
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(2));
 
-        BookingResponseDto response = new BookingResponseDto(BOOKING_ID, request.getStart(), request.getEnd(),
+        BookingResponseDto response = new BookingResponseDto(booking_id, request.getStart(), request.getEnd(),
                 BookingStatus.WAITING,
-                new BookingResponseDto.ItemForBookingDto(ITEM_ID, "Дрель"),
-                new BookingResponseDto.BookerDto(USER_ID, "User"));
+                new BookingResponseDto.ItemForBookingDto(item_id, "Дрель"),
+                new BookingResponseDto.BookerDto(user_id, "User"));
 
-        when(bookingService.createBooking(eq(USER_ID), any(BookingCreateDto.class)))
+        when(bookingService.createBooking(eq(user_id), any(BookingCreateDto.class)))
                 .thenReturn(response);
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", USER_ID)
+                        .header("X-Sharer-User-Id", user_id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(BOOKING_ID))
+                .andExpect(jsonPath("$.id").value(booking_id))
                 .andExpect(jsonPath("$.status").value("WAITING"));
 
-        verify(bookingService).createBooking(eq(USER_ID), any(BookingCreateDto.class));
+        verify(bookingService).createBooking(eq(user_id), any(BookingCreateDto.class));
     }
 
     @Test
     void updateBookingStatus_Approve_Success() throws Exception {
-        BookingResponseDto response = new BookingResponseDto(BOOKING_ID, null, null,
+        BookingResponseDto response = new BookingResponseDto(booking_id, null, null,
                 BookingStatus.APPROVED, null, null);
 
-        when(bookingService.updateBookingStatus(eq(BOOKING_ID), eq(USER_ID), eq(true)))
+        when(bookingService.updateBookingStatus(eq(booking_id), eq(user_id), eq(true)))
                 .thenReturn(response);
 
-        mockMvc.perform(patch("/bookings/{bookingId}", BOOKING_ID)
-                        .header("X-Sharer-User-Id", USER_ID)
+        mockMvc.perform(patch("/bookings/{bookingId}", booking_id)
+                        .header("X-Sharer-User-Id", user_id)
                         .param("approved", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("APPROVED"));
@@ -84,14 +84,14 @@ class BookingControllerIntegrationTest {
 
     @Test
     void updateBookingStatus_Reject_Success() throws Exception {
-        BookingResponseDto response = new BookingResponseDto(BOOKING_ID, null, null,
+        BookingResponseDto response = new BookingResponseDto(booking_id, null, null,
                 BookingStatus.REJECTED, null, null);
 
-        when(bookingService.updateBookingStatus(eq(BOOKING_ID), eq(USER_ID), eq(false)))
+        when(bookingService.updateBookingStatus(eq(booking_id), eq(user_id), eq(false)))
                 .thenReturn(response);
 
-        mockMvc.perform(patch("/bookings/{bookingId}", BOOKING_ID)
-                        .header("X-Sharer-User-Id", USER_ID)
+        mockMvc.perform(patch("/bookings/{bookingId}", booking_id)
+                        .header("X-Sharer-User-Id", user_id)
                         .param("approved", "false"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("REJECTED"));
@@ -99,34 +99,34 @@ class BookingControllerIntegrationTest {
 
     @Test
     void getBooking_AsBooker_Success() throws Exception {
-        BookingResponseDto response = new BookingResponseDto(BOOKING_ID, null, null,
-                BookingStatus.WAITING, null, new BookingResponseDto.BookerDto(USER_ID, "Booker"));
+        BookingResponseDto response = new BookingResponseDto(booking_id, null, null,
+                BookingStatus.WAITING, null, new BookingResponseDto.BookerDto(user_id, "Booker"));
 
-        when(bookingService.getBooking(eq(USER_ID), eq(BOOKING_ID)))
+        when(bookingService.getBooking(eq(user_id), eq(booking_id)))
                 .thenReturn(response);
 
-        mockMvc.perform(get("/bookings/{bookingId}", BOOKING_ID)
-                        .header("X-Sharer-User-Id", USER_ID))
+        mockMvc.perform(get("/bookings/{bookingId}", booking_id)
+                        .header("X-Sharer-User-Id", user_id))
                 .andExpect(status().isOk());
     }
 
     @Test
     void getBooking_AccessDenied_ThrowsException() throws Exception {
-        when(bookingService.getBooking(eq(USER_ID), eq(BOOKING_ID)))
+        when(bookingService.getBooking(eq(user_id), eq(booking_id)))
                 .thenThrow(new AccessDeniedException("Доступ запрещен"));
 
-        mockMvc.perform(get("/bookings/{bookingId}", BOOKING_ID)
-                        .header("X-Sharer-User-Id", USER_ID))
+        mockMvc.perform(get("/bookings/{bookingId}", booking_id)
+                        .header("X-Sharer-User-Id", user_id))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void getAllBookingsByBooker_WithStateFilter() throws Exception {
-        when(bookingService.getAllBookingsByBooker(eq(USER_ID), eq(BookingState.FUTURE), eq(0), eq(10)))
+        when(bookingService.getAllBookingsByBooker(eq(user_id), eq(BookingState.FUTURE), eq(0), eq(10)))
                 .thenReturn(List.of());
 
         mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", USER_ID)
+                        .header("X-Sharer-User-Id", user_id)
                         .param("state", "FUTURE")
                         .param("from", "0")
                         .param("size", "10"))
@@ -137,7 +137,7 @@ class BookingControllerIntegrationTest {
     void getAllBookingsByBooker_InvalidState_ThrowsException() throws Exception {
         // Контроллер сам бросает IllegalArgumentException → 400 Bad Request
         mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", USER_ID)
+                        .header("X-Sharer-User-Id", user_id)
                         .param("state", "INVALID_STATE"))
                 .andExpect(status().isBadRequest());
     }
@@ -145,11 +145,11 @@ class BookingControllerIntegrationTest {
     @Test
     void getAllBookingsByOwner_WithAllStates() throws Exception {
         for (BookingState state : BookingState.values()) {
-            when(bookingService.getAllBookingsByOwner(eq(USER_ID), eq(state), eq(0), eq(10)))
+            when(bookingService.getAllBookingsByOwner(eq(user_id), eq(state), eq(0), eq(10)))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/bookings/owner")
-                            .header("X-Sharer-User-Id", USER_ID)
+                            .header("X-Sharer-User-Id", user_id)
                             .param("state", state.name()))
                     .andExpect(status().isOk());
         }

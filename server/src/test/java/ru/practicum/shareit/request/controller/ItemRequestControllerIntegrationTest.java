@@ -35,84 +35,84 @@ class ItemRequestControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final long USER_ID = 1L;
-    private final long REQUEST_ID = 10L;
+    private final long user_id = 1L;
+    private final long request_id = 10L;
 
     @Test
     void createRequest_Success() throws Exception {
         ItemRequestCreateDto createDto = new ItemRequestCreateDto("Нужна дрель");
         ItemRequestResponseDto response = new ItemRequestResponseDto(
-                REQUEST_ID, "Нужна дрель", LocalDateTime.now(), List.of());
+                request_id, "Нужна дрель", LocalDateTime.now(), List.of());
 
-        when(itemRequestService.createRequest(eq(USER_ID), any(ItemRequestCreateDto.class)))
+        when(itemRequestService.createRequest(eq(user_id), any(ItemRequestCreateDto.class)))
                 .thenReturn(response);
 
         mockMvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", USER_ID)
+                        .header("X-Sharer-User-Id", user_id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(REQUEST_ID))
+                .andExpect(jsonPath("$.id").value(request_id))
                 .andExpect(jsonPath("$.description").value("Нужна дрель"));
 
-        verify(itemRequestService).createRequest(eq(USER_ID), any(ItemRequestCreateDto.class));
+        verify(itemRequestService).createRequest(eq(user_id), any(ItemRequestCreateDto.class));
     }
 
     @Test
     void getUserRequests_Success() throws Exception {
         ItemRequestResponseDto request = new ItemRequestResponseDto(
-                REQUEST_ID, "Запрос", LocalDateTime.now(), List.of());
+                request_id, "Запрос", LocalDateTime.now(), List.of());
 
-        when(itemRequestService.getUserRequests(eq(USER_ID)))
+        when(itemRequestService.getUserRequests(eq(user_id)))
                 .thenReturn(List.of(request));
 
         mockMvc.perform(get("/requests")
-                        .header("X-Sharer-User-Id", USER_ID))
+                        .header("X-Sharer-User-Id", user_id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(REQUEST_ID));
+                .andExpect(jsonPath("$[0].id").value(request_id));
 
-        verify(itemRequestService).getUserRequests(eq(USER_ID));
+        verify(itemRequestService).getUserRequests(eq(user_id));
     }
 
     @Test
     void getAllRequests_Success() throws Exception {
         ItemRequestResponseDto request = new ItemRequestResponseDto(
-                REQUEST_ID, "Чужой запрос", LocalDateTime.now(), List.of());
+                request_id, "Чужой запрос", LocalDateTime.now(), List.of());
 
-        when(itemRequestService.getAllRequests(eq(USER_ID)))
+        when(itemRequestService.getAllRequests(eq(user_id)))
                 .thenReturn(List.of(request));
 
         mockMvc.perform(get("/requests/all")
-                        .header("X-Sharer-User-Id", USER_ID))
+                        .header("X-Sharer-User-Id", user_id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].description").value("Чужой запрос"));
 
-        verify(itemRequestService).getAllRequests(eq(USER_ID));
+        verify(itemRequestService).getAllRequests(eq(user_id));
     }
 
     @Test
     void getRequestById_Success() throws Exception {
         ItemRequestResponseDto response = new ItemRequestResponseDto(
-                REQUEST_ID, "Запрос", LocalDateTime.now(), List.of());
+                request_id, "Запрос", LocalDateTime.now(), List.of());
 
-        when(itemRequestService.getRequestById(eq(REQUEST_ID), eq(USER_ID)))
+        when(itemRequestService.getRequestById(eq(request_id), eq(user_id)))
                 .thenReturn(response);
 
-        mockMvc.perform(get("/requests/{requestId}", REQUEST_ID)
-                        .header("X-Sharer-User-Id", USER_ID))
+        mockMvc.perform(get("/requests/{requestId}", request_id)
+                        .header("X-Sharer-User-Id", user_id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(REQUEST_ID));
+                .andExpect(jsonPath("$.id").value(request_id));
 
-        verify(itemRequestService).getRequestById(eq(REQUEST_ID), eq(USER_ID));
+        verify(itemRequestService).getRequestById(eq(request_id), eq(user_id));
     }
 
     @Test
     void getRequestById_NotFound_ThrowsException() throws Exception {
-        when(itemRequestService.getRequestById(eq(REQUEST_ID), eq(USER_ID)))
+        when(itemRequestService.getRequestById(eq(request_id), eq(user_id)))
                 .thenThrow(new NotFoundException("Запрос не найден"));
 
-        mockMvc.perform(get("/requests/{requestId}", REQUEST_ID)
-                        .header("X-Sharer-User-Id", USER_ID))
+        mockMvc.perform(get("/requests/{requestId}", request_id)
+                        .header("X-Sharer-User-Id", user_id))
                 .andExpect(status().isNotFound());
     }
 }
