@@ -36,7 +36,7 @@ class UserControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final long user_id = 1L;
+    private final long userId = 1L;
 
     @Test
     void getAllUsers_Success() throws Exception {
@@ -51,29 +51,29 @@ class UserControllerIntegrationTest {
 
     @Test
     void getUserById_Success() throws Exception {
-        UserDto user = new UserDto(user_id, "Иван", "ivan@test.com");
-        when(userService.getUserById(eq(user_id))).thenReturn(user);
+        UserDto user = new UserDto(userId, "Иван", "ivan@test.com");
+        when(userService.getUserById(eq(userId))).thenReturn(user);
 
-        mockMvc.perform(get("/users/{userId}", user_id))
+        mockMvc.perform(get("/users/{userId}", userId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(user_id))
+                .andExpect(jsonPath("$.id").value(userId))
                 .andExpect(jsonPath("$.name").value("Иван"))
                 .andExpect(jsonPath("$.email").value("ivan@test.com"));
     }
 
     @Test
     void getUserById_NotFound_ThrowsException() throws Exception {
-        when(userService.getUserById(eq(user_id)))
+        when(userService.getUserById(eq(userId)))
                 .thenThrow(new NotFoundException("Пользователь не найден"));
 
-        mockMvc.perform(get("/users/{userId}", user_id))
+        mockMvc.perform(get("/users/{userId}", userId))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void addUser_Success() throws Exception {
         UserDto newUser = new UserDto(null, "Новый", "new@test.com");
-        UserDto created = new UserDto(user_id, "Новый", "new@test.com");
+        UserDto created = new UserDto(userId, "Новый", "new@test.com");
 
         when(userService.addUser(any(UserDto.class))).thenReturn(created);
 
@@ -81,7 +81,7 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUser)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(user_id))
+                .andExpect(jsonPath("$.id").value(userId))
                 .andExpect(jsonPath("$.email").value("new@test.com"));
 
         verify(userService).addUser(any(UserDto.class));
@@ -102,13 +102,13 @@ class UserControllerIntegrationTest {
 
     @Test
     void updateUser_Success() throws Exception {
-        UserUpdateDto updateDto = new UserUpdateDto(user_id, "Обновлённый", "updated@test.com");
-        UserUpdateDto updated = new UserUpdateDto(user_id, "Обновлённый", "updated@test.com");
+        UserUpdateDto updateDto = new UserUpdateDto(userId, "Обновлённый", "updated@test.com");
+        UserUpdateDto updated = new UserUpdateDto(userId, "Обновлённый", "updated@test.com");
 
-        when(userService.updateUser(eq(user_id), any(UserUpdateDto.class)))
+        when(userService.updateUser(eq(userId), any(UserUpdateDto.class)))
                 .thenReturn(updated);
 
-        mockMvc.perform(patch("/users/{userId}", user_id)
+        mockMvc.perform(patch("/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
@@ -118,11 +118,11 @@ class UserControllerIntegrationTest {
 
     @Test
     void deleteUser_Success() throws Exception {
-        doNothing().when(userService).deleteUserById(eq(user_id));
+        doNothing().when(userService).deleteUserById(eq(userId));
 
-        mockMvc.perform(delete("/users/{userId}", user_id))
+        mockMvc.perform(delete("/users/{userId}", userId))
                 .andExpect(status().isNoContent());
 
-        verify(userService).deleteUserById(eq(user_id));
+        verify(userService).deleteUserById(eq(userId));
     }
 }
