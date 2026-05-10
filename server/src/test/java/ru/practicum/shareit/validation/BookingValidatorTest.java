@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -146,5 +147,61 @@ class BookingValidatorTest {
         ValidationException ex = assertThrows(ValidationException.class,
                 () -> bookingValidator.validateUpdateStatus(booking, 2L));
         assertEquals("Статус можно изменить только для бронирований в статусе WAITING", ex.getMessage());
+    }
+
+    @Test
+    void validateAccess_AsBooker_Success() {
+        User booker = new User();
+        booker.setId(1L);
+
+        User owner = new User();
+        owner.setId(2L);
+
+        Item item = new Item();
+        item.setOwner(owner);
+
+        Booking booking = new Booking();
+        booking.setBooker(booker);
+        booking.setItem(item);
+
+        assertDoesNotThrow(() -> bookingValidator.validateAccess(booking, 1L));
+    }
+
+    @Test
+    void validateAccess_AsOwner_Success() {
+        User booker = new User();
+        booker.setId(1L);
+
+        User owner = new User();
+        owner.setId(2L);
+
+        Item item = new Item();
+        item.setOwner(owner);
+
+        Booking booking = new Booking();
+        booking.setBooker(booker);
+        booking.setItem(item);
+
+        assertDoesNotThrow(() -> bookingValidator.validateAccess(booking, 2L));
+    }
+
+    @Test
+    void validateAccess_AsThirdParty_ThrowsNotFoundException() {
+        User booker = new User();
+        booker.setId(1L);
+
+        User owner = new User();
+        owner.setId(2L);
+
+        Item item = new Item();
+        item.setOwner(owner);
+
+        Booking booking = new Booking();
+        booking.setBooker(booker);
+        booking.setItem(item);
+
+        NotFoundException ex = assertThrows(NotFoundException.class,
+                () -> bookingValidator.validateAccess(booking, 3L));
+        assertEquals("Доступ запрещён", ex.getMessage());
     }
 }
