@@ -5,6 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
@@ -35,6 +38,9 @@ class ItemServiceUnitTest {
 
     @Mock
     private ItemRequestRepository requestRepository;
+
+    @Mock
+    private BookingRepository bookingRepository;
 
     @Mock
     private ValidationUtils validationUtils;
@@ -77,22 +83,6 @@ class ItemServiceUnitTest {
         assertEquals("Старое описание", result.getDescription());
         assertTrue(result.getAvailable());
         verify(itemRepository).save(item);
-    }
-
-    @Test
-    void deleteItem_NotOwner_ThrowsException() {
-        User owner = new User();
-        owner.setId(2L);
-        Item item = new Item();
-        item.setId(10L);
-        item.setOwner(owner);
-
-        when(validationUtils.getExistingUser(1L)).thenReturn(new User());
-        when(validationUtils.getExistingItem(10L)).thenReturn(item);
-
-        NotFoundException ex = assertThrows(NotFoundException.class,
-                () -> itemService.deleteItem(1L, 10L));
-        assertTrue(ex.getMessage().contains("не принадлежит"));
     }
 
     @Test
@@ -236,5 +226,139 @@ class ItemServiceUnitTest {
         assertEquals(1, result.size());
         assertEquals("Коммент", result.get(0).getText());
         assertEquals("Автор", result.get(0).getAuthorName());
+    }
+
+    @Test
+    void getAllItems_WithBookings_SetsLastAndNextBooking() {
+        User owner = new User();
+        owner.setId(1L);
+
+        Item item = new Item();
+        item.setId(10L);
+        item.setName("Дрель");
+        item.setOwner(owner);
+
+        Booking lastBooking = new Booking();
+        lastBooking.setId(100L);
+        lastBooking.setBooker(new User());
+        lastBooking.getBooker().setId(2L);
+        lastBooking.setStart(LocalDateTime.now().minusDays(10));
+        lastBooking.setEnd(LocalDateTime.now().minusDays(5));
+
+        Booking nextBooking = new Booking();
+        nextBooking.setId(101L);
+        nextBooking.setBooker(new User());
+        nextBooking.getBooker().setId(3L);
+        nextBooking.setStart(LocalDateTime.now().plusDays(5));
+        nextBooking.setEnd(LocalDateTime.now().plusDays(10));
+
+        when(validationUtils.getExistingUser(1L)).thenReturn(owner);
+        when(itemRepository.findByOwnerId(1L)).thenReturn(List.of(item));
+        when(bookingRepository.findLastBookingByItemIdAndStatusBeforeNow(
+                eq(10L), any(LocalDateTime.class), eq(BookingStatus.APPROVED)))
+                .thenReturn(Optional.of(lastBooking));
+        when(bookingRepository.findNextBookingByItemIdAndStatusAfterNow(
+                eq(10L), any(LocalDateTime.class), eq(BookingStatus.APPROVED)))
+                .thenReturn(Optional.of(nextBooking));
+
+        var result = itemService.getAllItems(1L);
+
+        assertFalse(result.isEmpty());
+        ItemDto dto = result.iterator().next();
+        assertNotNull(dto.getLastBooking());
+        assertEquals(100L, dto.getLastBooking().getId());
+        assertNotNull(dto.getNextBooking());
+        assertEquals(101L, dto.getNextBooking().getId());
+    }
+
+    @Test
+    void getAllItems_WithoutBookings_SetsNullBookings() {
+        User owner = new User();
+        owner.setId(1L);
+
+        Item item = new Item();
+        item.setId(10L);
+        item.setName("Дрель");
+        item.setOwner(owner);
+
+        when(validationUtils.getExistingUser(1L)).thenReturn(owner);
+        when(itemRepository.findByOwnerId(1L)).thenReturn(List.of(item));
+        when(bookingRepository.findLastBookingByItemIdAndStatusBeforeNow(
+                eq(10L), any(LocalDateTime.class), eq(BookingStatus.APPROVED)))
+                .thenReturn(Optional.empty());
+        when(bookingRepository.findNextBookingByItemIdAndStatusAfterNow(
+                eq(10L), any(LocalDateTime.class), eq(BookingStatus.APPROVED)))
+                .thenReturn(Optional.empty());
+
+        var result = itemService.getAllItems(1L);
+
+        assertFalse(result.isEmpty());
+        ItemDto dto = result.iterator().next();
+        assertNull(dto.getLastBooking());
+        assertNull(dto.getNextBooking());
+    }
+
+
+    @Test
+    void search_WithText_ReturnsMappedItems() {
+        Item item = new Item();
+        item.setId(10L);
+        item.setName("Дрель");
+        item.setDescription("Профессиональная");
+        item.setAvailable(true);
+
+        when(itemRepository.searchByText("дрель")).thenReturn(List.of(item));
+
+        var result = itemService.search("дрель");
+
+        assertFalse(result.isEmpty());
+        ItemDto dto = result.iterator().next();
+        assertEquals("Дрель", dto.getName());
+        verify(itemRepository).searchByText("дрель");
+    }
+
+
+    @Test
+    void updateItem_NotOwner_ThrowsException() {
+        User owner = new User();
+        owner.setId(2L);
+
+        User requester = new User();
+        requester.setId(1L);
+
+        Item item = new Item();
+        item.setId(10L);
+        item.setOwner(owner);
+
+        ItemUpdateDto updateDto = new ItemUpdateDto(10L, "Новое имя", null, null);
+
+        when(validationUtils.getExistingUser(1L)).thenReturn(requester);
+        when(validationUtils.getExistingItem(10L)).thenReturn(item);
+
+        NotFoundException ex = assertThrows(NotFoundException.class,
+                () -> itemService.updateItem(1L, 10L, updateDto));
+        assertTrue(ex.getMessage().contains("не принадлежит"));
+        verify(itemRepository, never()).save(any());
+    }
+
+    @Test
+    void deleteItem_NotOwner_ThrowsException() {
+        User owner = new User();
+        owner.setId(2L);
+
+        User requester = new User();
+        requester.setId(1L);
+
+        Item item = new Item();
+        item.setId(10L);
+        item.setOwner(owner);
+
+        when(validationUtils.getExistingUser(1L)).thenReturn(requester);
+        when(validationUtils.getExistingItem(10L)).thenReturn(item);
+
+        NotFoundException ex = assertThrows(NotFoundException.class,
+                () -> itemService.deleteItem(1L, 10L));
+        assertTrue(ex.getMessage().contains("не принадлежит"));
+        verify(itemRepository, never()).deleteById(anyLong());
     }
 }
