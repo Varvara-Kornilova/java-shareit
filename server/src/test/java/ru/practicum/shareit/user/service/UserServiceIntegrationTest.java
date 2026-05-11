@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class UserServiceIntegrationTest {
+public class UserServiceIntegrationTest {
 
     @Autowired
     private UserService userService;
 
     @Test
-    void addUser_Success() {
+    public void addUser_Success() {
         UserDto newUser = new UserDto(null, "Test User", "test@test.com");
 
         UserDto created = userService.addUser(newUser);
@@ -32,7 +32,7 @@ class UserServiceIntegrationTest {
     }
 
     @Test
-    void addUser_WithDuplicateEmail_ThrowsException() {
+    public void addUser_WithDuplicateEmail_ThrowsException() {
         UserDto user1 = new UserDto(null, "User1", "duplicate@test.com");
         UserDto user2 = new UserDto(null, "User2", "duplicate@test.com");
 
@@ -42,7 +42,7 @@ class UserServiceIntegrationTest {
     }
 
     @Test
-    void updateUser_Success() {
+    public void updateUser_Success() {
         UserDto user = userService.addUser(new UserDto(null, "Old Name", "old@test.com"));
         UserUpdateDto updateDto = new UserUpdateDto(user.getId(), "New Name", "new@test.com");
 
@@ -53,12 +53,12 @@ class UserServiceIntegrationTest {
     }
 
     @Test
-    void getUserById_NotFound_ThrowsException() {
+    public void getUserById_NotFound_ThrowsException() {
         assertThrows(NotFoundException.class, () -> userService.getUserById(999L));
     }
 
     @Test
-    void getAllUsers_ReturnsAllUsers() {
+    public void getAllUsers_ReturnsAllUsers() {
         userService.addUser(new UserDto(null, "User One", "one@test.com"));
         userService.addUser(new UserDto(null, "User Two", "two@test.com"));
         userService.addUser(new UserDto(null, "User Three", "three@test.com"));
@@ -72,13 +72,13 @@ class UserServiceIntegrationTest {
     }
 
     @Test
-    void getAllUsers_ReturnsEmpty_WhenNoUsers() {
+    public void getAllUsers_ReturnsEmpty_WhenNoUsers() {
         Collection<UserDto> users = userService.getAllUsers();
         assertTrue(users.isEmpty());
     }
 
     @Test
-    void getUserById_Success() {
+    public void getUserById_Success() {
         UserDto created = userService.addUser(new UserDto(null, "Find Me", "findme@test.com"));
 
         UserDto found = userService.getUserById(created.getId());
@@ -89,7 +89,7 @@ class UserServiceIntegrationTest {
     }
 
     @Test
-    void deleteUserById_Success() {
+    public void deleteUserById_Success() {
         UserDto created = userService.addUser(new UserDto(null, "To Delete", "delete@test.com"));
         Long userId = created.getId();
 

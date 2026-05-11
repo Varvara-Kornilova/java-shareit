@@ -10,10 +10,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ItemRequestMapperTest {
+public class ItemRequestMapperTest {
 
     @Test
-    void toResponseDto_WithItems() {
+    public void toResponseDto_WithItems() {
         ItemRequest request = new ItemRequest();
         request.setId(10L);
         request.setDescription("Нужен инструмент");
@@ -33,7 +33,7 @@ class ItemRequestMapperTest {
     }
 
     @Test
-    void toResponseDto_WithNullItems_ReturnsEmptyList() {
+    public void toResponseDto_WithNullItems_ReturnsEmptyList() {
         ItemRequest request = new ItemRequest();
         request.setId(10L);
         request.setDescription("Запрос");
@@ -46,7 +46,7 @@ class ItemRequestMapperTest {
     }
 
     @Test
-    void toResponseDto_WithEmptyItemsList() {
+    public void toResponseDto_WithEmptyItemsList() {
         ItemRequest request = new ItemRequest();
         request.setId(10L);
         request.setDescription("Запрос");

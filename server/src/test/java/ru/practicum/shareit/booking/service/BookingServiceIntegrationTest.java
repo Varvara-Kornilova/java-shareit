@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class BookingServiceIntegrationTest {
+public class BookingServiceIntegrationTest {
 
     @Autowired
     private BookingService bookingService;
@@ -33,7 +33,7 @@ class BookingServiceIntegrationTest {
     private ItemService itemService;
 
     @Test
-    void createBooking_Success() {
+    public void createBooking_Success() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
 
@@ -54,7 +54,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void createBooking_ItemNotFound_ThrowsException() {
+    public void createBooking_ItemNotFound_ThrowsException() {
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
         BookingCreateDto createDto = new BookingCreateDto(
                 999L, // несуществующий item
@@ -66,7 +66,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void updateBookingStatus_Approve_Success() {
+    public void updateBookingStatus_Approve_Success() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
 
@@ -86,7 +86,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void getAllBookingsByBooker_WithStateFilter() {
+    public void getAllBookingsByBooker_WithStateFilter() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
 
@@ -105,7 +105,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void updateBookingStatus_Reject_Success() {
+    public void updateBookingStatus_Reject_Success() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
 
@@ -125,7 +125,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void getBooking_AsBooker_Success() {
+    public void getBooking_AsBooker_Success() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
 
@@ -146,7 +146,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void getBooking_AsOwner_Success() {
+    public void getBooking_AsOwner_Success() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
 
@@ -166,7 +166,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void getBooking_AsThirdParty_ThrowsAccessDenied() {
+    public void getBooking_AsThirdParty_ThrowsAccessDenied() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
         UserDto thirdParty = userService.addUser(new UserDto(null, "Third", "third@test.com"));
@@ -186,20 +186,19 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void getAllBookingsByBooker_UserNotFound_ThrowsException() {
+    public void getAllBookingsByBooker_UserNotFound_ThrowsException() {
         assertThrows(NotFoundException.class, () ->
                 bookingService.getAllBookingsByBooker(999L, BookingState.ALL, 0, 10));
     }
 
     @Test
-    void getAllBookingsByOwner_UserNotFound_ThrowsException() {
-        // Покрываем ветку: userRepository.findById(ownerId).isEmpty() → NotFoundException
+    public void getAllBookingsByOwner_UserNotFound_ThrowsException() {
         assertThrows(NotFoundException.class, () ->
                 bookingService.getAllBookingsByOwner(999L, BookingState.ALL, 0, 10));
     }
 
     @Test
-    void getAllBookingsByBooker_WithFutureState() {
+    public void getAllBookingsByBooker_WithFutureState() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
 
@@ -219,7 +218,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void getAllBookingsByOwner_WithAllStates() {
+    public void getAllBookingsByOwner_WithAllStates() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
 

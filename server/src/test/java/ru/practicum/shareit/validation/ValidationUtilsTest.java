@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ValidationUtilsTest {
+public class ValidationUtilsTest {
 
     @Mock
     private UserRepository userRepository;
@@ -32,7 +32,7 @@ class ValidationUtilsTest {
     private ValidationUtils validationUtils;
 
     @Test
-    void getExistingUser_Found_ReturnsUser() {
+    public void getExistingUser_Found_ReturnsUser() {
         User user = new User();
         user.setId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -44,7 +44,7 @@ class ValidationUtilsTest {
     }
 
     @Test
-    void getExistingUser_NotFound_ThrowsException() {
+    public void getExistingUser_NotFound_ThrowsException() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         NotFoundException ex = assertThrows(NotFoundException.class,
@@ -53,7 +53,7 @@ class ValidationUtilsTest {
     }
 
     @Test
-    void checkOwnerAccess_Owner_Success() {
+    public void checkOwnerAccess_Owner_Success() {
         Item item = new Item();
         User owner = new User();
         owner.setId(2L);
@@ -63,7 +63,7 @@ class ValidationUtilsTest {
     }
 
     @Test
-    void checkOwnerAccess_NotOwner_ThrowsException() {
+    public void checkOwnerAccess_NotOwner_ThrowsException() {
         Item item = new Item();
         User owner = new User();
         owner.setId(2L);
@@ -75,7 +75,7 @@ class ValidationUtilsTest {
     }
 
     @Test
-    void checkDateRange_Valid_DoesNotThrow() {
+    public void checkDateRange_Valid_DoesNotThrow() {
         LocalDateTime start = LocalDateTime.now().plusDays(1);
         LocalDateTime end = start.plusDays(1);
 
@@ -83,7 +83,7 @@ class ValidationUtilsTest {
     }
 
     @Test
-    void checkDateRange_StartAfterEnd_ThrowsException() {
+    public void checkDateRange_StartAfterEnd_ThrowsException() {
         LocalDateTime start = LocalDateTime.now().plusDays(2);
         LocalDateTime end = start.minusDays(1);
 
@@ -93,20 +93,20 @@ class ValidationUtilsTest {
     }
 
     @Test
-    void checkDateRange_NullStart_ThrowsException() {
+    public void checkDateRange_NullStart_ThrowsException() {
         ValidationException ex = assertThrows(ValidationException.class,
                 () -> validationUtils.checkDateRange(null, LocalDateTime.now()));
         assertTrue(ex.getMessage().contains("Некорректные даты"));
     }
 
     @Test
-    void checkNotInPast_Future_DoesNotThrow() {
+    public void checkNotInPast_Future_DoesNotThrow() {
         LocalDateTime future = LocalDateTime.now().plusHours(1);
         assertDoesNotThrow(() -> validationUtils.checkNotInPast(future));
     }
 
     @Test
-    void checkNotInPast_Past_ThrowsException() {
+    public void checkNotInPast_Past_ThrowsException() {
         LocalDateTime past = LocalDateTime.now().minusHours(1);
         ValidationException ex = assertThrows(ValidationException.class,
                 () -> validationUtils.checkNotInPast(past));

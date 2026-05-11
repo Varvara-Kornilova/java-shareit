@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookingValidatorTest {
+public class BookingValidatorTest {
 
     @Mock
     private ValidationUtils validationUtils;
@@ -32,7 +32,7 @@ class BookingValidatorTest {
     private BookingValidator bookingValidator;
 
     @Test
-    void validateCreateBooking_Success() {
+    public void validateCreateBooking_Success() {
         User booker = new User();
         booker.setId(1L);
         Item item = new Item();
@@ -53,7 +53,7 @@ class BookingValidatorTest {
     }
 
     @Test
-    void validateCreateBooking_BookingOwnItem_ThrowsException() {
+    public void validateCreateBooking_BookingOwnItem_ThrowsException() {
         User booker = new User();
         booker.setId(1L);
         Item item = new Item();
@@ -74,7 +74,7 @@ class BookingValidatorTest {
     }
 
     @Test
-    void validateCreateBooking_ItemNotAvailable_ThrowsException() {
+    public void validateCreateBooking_ItemNotAvailable_ThrowsException() {
         User booker = new User();
         booker.setId(1L);
         Item item = new Item();
@@ -97,7 +97,7 @@ class BookingValidatorTest {
     }
 
     @Test
-    void validateCreateBooking_StartAfterEnd_ThrowsException() {
+    public void validateCreateBooking_StartAfterEnd_ThrowsException() {
         User booker = new User();
         booker.setId(1L);
         Item item = new Item();
@@ -108,7 +108,7 @@ class BookingValidatorTest {
         item.setOwner(owner);
 
         BookingCreateDto dto = new BookingCreateDto(10L,
-                LocalDateTime.now().plusDays(2), // start позже end
+                LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(1));
 
         when(validationUtils.getExistingUser(1L)).thenReturn(booker);
@@ -121,7 +121,7 @@ class BookingValidatorTest {
     }
 
     @Test
-    void validateUpdateStatus_Success() {
+    public void validateUpdateStatus_Success() {
         Booking booking = new Booking();
         booking.setStatus(BookingStatus.WAITING);
         Item item = new Item();
@@ -135,7 +135,7 @@ class BookingValidatorTest {
     }
 
     @Test
-    void validateUpdateStatus_StatusNotWaiting_ThrowsException() {
+    public void validateUpdateStatus_StatusNotWaiting_ThrowsException() {
         Booking booking = new Booking();
         booking.setStatus(BookingStatus.APPROVED);
         Item item = new Item();
@@ -150,7 +150,7 @@ class BookingValidatorTest {
     }
 
     @Test
-    void validateAccess_AsBooker_Success() {
+    public void validateAccess_AsBooker_Success() {
         User booker = new User();
         booker.setId(1L);
 
@@ -168,7 +168,7 @@ class BookingValidatorTest {
     }
 
     @Test
-    void validateAccess_AsOwner_Success() {
+    public void validateAccess_AsOwner_Success() {
         User booker = new User();
         booker.setId(1L);
 
@@ -186,7 +186,7 @@ class BookingValidatorTest {
     }
 
     @Test
-    void validateAccess_AsThirdParty_ThrowsNotFoundException() {
+    public void validateAccess_AsThirdParty_ThrowsNotFoundException() {
         User booker = new User();
         booker.setId(1L);
 

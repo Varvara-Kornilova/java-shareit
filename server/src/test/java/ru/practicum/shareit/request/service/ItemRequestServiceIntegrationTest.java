@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class ItemRequestServiceIntegrationTest {
+public class ItemRequestServiceIntegrationTest {
 
     @Autowired
     private ItemRequestService requestService;
@@ -26,7 +26,7 @@ class ItemRequestServiceIntegrationTest {
     private ItemRequestRepository requestRepository;
 
     @Test
-    void createRequest_Success() {
+    public void createRequest_Success() {
         UserDto user = userService.addUser(new UserDto(null, "Test User", "test@test.com"));
         ItemRequestCreateDto createDto = new ItemRequestCreateDto("Нужна дрель");
 
@@ -39,7 +39,7 @@ class ItemRequestServiceIntegrationTest {
     }
 
     @Test
-    void getUserRequests_WithAndWithoutRequests() {
+    public void getUserRequests_WithAndWithoutRequests() {
         UserDto user1 = userService.addUser(new UserDto(null, "User1", "user1@test.com"));
         UserDto user2 = userService.addUser(new UserDto(null, "User2", "user2@test.com"));
 
@@ -54,7 +54,7 @@ class ItemRequestServiceIntegrationTest {
     }
 
     @Test
-    void getAllRequests_ExcludesOwnRequests() {
+    public void getAllRequests_ExcludesOwnRequests() {
         UserDto user1 = userService.addUser(new UserDto(null, "User1", "user1@test.com"));
         UserDto user2 = userService.addUser(new UserDto(null, "User2", "user2@test.com"));
 

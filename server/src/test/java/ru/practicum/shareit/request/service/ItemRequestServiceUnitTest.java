@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ItemRequestServiceUnitTest {
+public class ItemRequestServiceUnitTest {
 
     @Mock
     private ItemRequestRepository requestRepository;
@@ -37,7 +37,7 @@ class ItemRequestServiceUnitTest {
     private ItemRequestServiceImpl itemRequestService;
 
     @Test
-    void getRequestById_NotFound_ThrowsException() {
+    public void getRequestById_NotFound_ThrowsException() {
         User user = new User();
         user.setId(1L);
 
@@ -50,7 +50,7 @@ class ItemRequestServiceUnitTest {
     }
 
     @Test
-    void findItemsByRequestId_EmptyList_ReturnsEmpty() {
+    public void findItemsByRequestId_EmptyList_ReturnsEmpty() {
         User user = new User();
         user.setId(1L);
         ItemRequest request = new ItemRequest();
@@ -61,8 +61,7 @@ class ItemRequestServiceUnitTest {
 
         when(validationUtils.getExistingUser(1L)).thenReturn(user);
         when(requestRepository.findById(10L)).thenReturn(Optional.of(request));
-        when(itemRepository.findByRequestId(10L)).thenReturn(List.of()); // нет связанных вещей
-
+        when(itemRepository.findByRequestId(10L)).thenReturn(List.of());
         ItemRequestResponseDto result = itemRequestService.getRequestById(10L, 1L);
 
         assertNotNull(result.getItems());
@@ -70,7 +69,7 @@ class ItemRequestServiceUnitTest {
     }
 
     @Test
-    void findItemsByRequestId_WithItems_MapsCorrectly() {
+    public void findItemsByRequestId_WithItems_MapsCorrectly() {
         User user = new User();
         user.setId(1L);
         ItemRequest request = new ItemRequest();

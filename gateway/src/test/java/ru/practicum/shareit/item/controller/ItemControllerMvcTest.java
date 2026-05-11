@@ -23,19 +23,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = ItemController.class)
-class ItemControllerMvcTest {
+public class ItemControllerMvcTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private ItemClient itemClient;  // ✅ Мокаем клиент
+    private ItemClient itemClient;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void addItem_WithRequestId_ShouldReturn200() throws Exception {
+    public void addItem_WithRequestId_ShouldReturn200() throws Exception {
         ItemDto newItem = new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), 1L);
         ItemDto created = new ItemDto(10L, "Дрель", "Профессиональная", true, null, null, List.of(), 1L);
 
@@ -53,7 +53,7 @@ class ItemControllerMvcTest {
     }
 
     @Test
-    void addItem_WithoutName_ShouldReturn400() throws Exception {
+    public void addItem_WithoutName_ShouldReturn400() throws Exception {
         ItemDto invalidItem = new ItemDto(null, "", "Описание", true, null, null, List.of(), null);
 
         mockMvc.perform(post("/items")
@@ -64,7 +64,7 @@ class ItemControllerMvcTest {
     }
 
     @Test
-    void addComment_ShouldReturn200() throws Exception {
+    public void addComment_ShouldReturn200() throws Exception {
         CommentCreateDto commentDto = new CommentCreateDto("Отличный товар!");
         CommentDto response = new CommentDto(5L, "Отличный товар!", "User", LocalDateTime.now());
 
@@ -82,7 +82,7 @@ class ItemControllerMvcTest {
     }
 
     @Test
-    void getItemById_WithComments_ShouldReturnComments() throws Exception {
+    public void getItemById_WithComments_ShouldReturnComments() throws Exception {
         ItemDto item = new ItemDto(10L, "Дрель", "Профессиональная", true, null, null,
                 List.of(new CommentDto(1L, "Good", "User", LocalDateTime.now())), null);
 

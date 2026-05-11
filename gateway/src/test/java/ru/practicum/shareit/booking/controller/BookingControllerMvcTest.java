@@ -24,19 +24,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = BookingController.class)
-class BookingControllerMvcTest {
+public class BookingControllerMvcTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private BookingClient bookingClient;  // ✅ Мокаем клиент, а не сервис!
+    private BookingClient bookingClient;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void createBooking_ShouldReturn200() throws Exception {
+    public void createBooking_ShouldReturn200() throws Exception {
         BookingCreateDto createDto = new BookingCreateDto(10L,
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(2));
@@ -47,7 +47,6 @@ class BookingControllerMvcTest {
                 new BookingResponseDto.ItemForBookingDto(10L, "Дрель"),
                 new BookingResponseDto.BookerDto(1L, "Booker"));
 
-        // Клиент возвращает ResponseEntity<Object>
         when(bookingClient.bookItem(eq(1L), any(BookingCreateDto.class)))
                 .thenReturn(ResponseEntity.ok(response));
 
@@ -61,12 +60,11 @@ class BookingControllerMvcTest {
     }
 
     @Test
-    void createBooking_WithInvalidDates_ShouldReturn400() throws Exception {
+    public void createBooking_WithInvalidDates_ShouldReturn400() throws Exception {
         BookingCreateDto invalidDto = new BookingCreateDto(10L,
                 LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(1));
 
-        // Валидация происходит на уровне DTO + @Valid, клиент не вызывается
         mockMvc.perform(post("/bookings")
                         .header("X-Sharer-User-Id", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -75,7 +73,7 @@ class BookingControllerMvcTest {
     }
 
     @Test
-    void updateBookingStatus_Approve_ShouldReturn200() throws Exception {
+    public void updateBookingStatus_Approve_ShouldReturn200() throws Exception {
         BookingResponseDto response = new BookingResponseDto(1L,
                 LocalDateTime.now(), LocalDateTime.now().plusDays(1),
                 BookingStatus.APPROVED,
@@ -92,7 +90,7 @@ class BookingControllerMvcTest {
     }
 
     @Test
-    void getAllBookingsByBooker_WithStateFilter() throws Exception {
+    public void getAllBookingsByBooker_WithStateFilter() throws Exception {
         when(bookingClient.getBookings(eq(1L), eq(BookingState.FUTURE), eq(0), eq(10)))
                 .thenReturn(ResponseEntity.ok(List.of()));
 

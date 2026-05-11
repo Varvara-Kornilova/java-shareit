@@ -11,33 +11,33 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class ErrorHandlerTest {
+public class ErrorHandlerTest {
 
     private final ErrorHandler errorHandler = new ErrorHandler();
 
     @Test
-    void handleNotFound_ReturnsCorrectMap() {
+    public void handleNotFound_ReturnsCorrectMap() {
         NotFoundException ex = new NotFoundException("Not found");
         Map<String, String> result = errorHandler.handleNotFound(ex);
         assertEquals("Not found", result.get("error"));
     }
 
     @Test
-    void handleAccessDenied_ReturnsCorrectMap() {
+    public void handleAccessDenied_ReturnsCorrectMap() {
         AccessDeniedException ex = new AccessDeniedException("Access denied");
         Map<String, String> result = errorHandler.handleAccessDenied(ex);
         assertEquals("Access denied", result.get("error"));
     }
 
     @Test
-    void handleConflict_ReturnsCorrectMap() {
+    public void handleConflict_ReturnsCorrectMap() {
         DuplicatedDataException ex = new DuplicatedDataException("Email exists");
         Map<String, String> result = errorHandler.handleConflict(ex);
         assertEquals("Email exists", result.get("error"));
     }
 
     @Test
-    void handleValidation_MethodArgumentNotValidException_WithMessage() {
+    public void handleValidation_MethodArgumentNotValidException_WithMessage() {
         MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
         BindingResult bindingResult = mock(BindingResult.class);
         FieldError fieldError = mock(FieldError.class);
@@ -51,19 +51,19 @@ class ErrorHandlerTest {
     }
 
     @Test
-    void handleValidation_MethodArgumentNotValidException_EmptyErrors() {
+    public void handleValidation_MethodArgumentNotValidException_EmptyErrors() {
         MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
         BindingResult bindingResult = mock(BindingResult.class);
 
         when(ex.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getAllErrors()).thenReturn(List.of());  // ← Пустой список, без матчеров!
+        when(bindingResult.getAllErrors()).thenReturn(List.of());
 
         Map<String, String> result = errorHandler.handleValidation(ex);
         assertEquals("Validation failed", result.get("error"));
     }
 
     @Test
-    void handleValidation_ValidationException_ReturnsCorrectMap() {
+    public void handleValidation_ValidationException_ReturnsCorrectMap() {
         ValidationException ex = new ValidationException("Invalid date range");
         Map<String, String> result = errorHandler.handleValidation(ex);
         assertEquals("Invalid date range", result.get("error"));

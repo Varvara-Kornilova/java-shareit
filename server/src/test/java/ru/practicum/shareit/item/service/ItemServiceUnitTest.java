@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ItemServiceUnitTest {
+public class ItemServiceUnitTest {
 
     @Mock
     private ItemRepository itemRepository;
@@ -49,19 +49,19 @@ class ItemServiceUnitTest {
     private ItemServiceImpl itemService;
 
     @Test
-    void search_NullText_ReturnsEmptyList() {
+    public void search_NullText_ReturnsEmptyList() {
         var result = itemService.search(null);
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void search_BlankText_ReturnsEmptyList() {
+    public void search_BlankText_ReturnsEmptyList() {
         var result = itemService.search("   ");
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void updateItem_PartialUpdate_OnlyName() {
+    public void updateItem_PartialUpdate_OnlyName() {
         User owner = new User();
         owner.setId(1L);
         Item item = new Item();
@@ -86,7 +86,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void getAllItems_EmptyList_ReturnsEmpty() {
+    public void getAllItems_EmptyList_ReturnsEmpty() {
         User user = new User();
         user.setId(1L);
 
@@ -100,7 +100,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void getItem_NotFound_ThrowsException() {
+    public void getItem_NotFound_ThrowsException() {
         when(itemRepository.findById(999L)).thenReturn(Optional.empty());
 
         NotFoundException ex = assertThrows(NotFoundException.class,
@@ -109,7 +109,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void addItem_WithNullRequestId_Success() {
+    public void addItem_WithNullRequestId_Success() {
         User owner = new User();
         owner.setId(1L);
         ItemDto newItem = new ItemDto(null, "Дрель", "Описание", true, null, null, List.of(), null);
@@ -125,11 +125,11 @@ class ItemServiceUnitTest {
 
         assertNotNull(result.getId());
         assertEquals("Дрель", result.getName());
-        verify(requestRepository, never()).findById(anyLong()); // не вызывался, т.к. requestId = null
+        verify(requestRepository, never()).findById(anyLong());
     }
 
     @Test
-    void updateItem_PartialUpdate_OnlyDescription() {
+    public void updateItem_PartialUpdate_OnlyDescription() {
         User owner = new User();
         owner.setId(1L);
         Item item = new Item();
@@ -153,7 +153,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void updateItem_PartialUpdate_OnlyAvailable() {
+    public void updateItem_PartialUpdate_OnlyAvailable() {
         User owner = new User();
         owner.setId(1L);
         Item item = new Item();
@@ -177,7 +177,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void deleteItem_Success() {
+    public void deleteItem_Success() {
         User owner = new User();
         owner.setId(1L);
         Item item = new Item();
@@ -192,7 +192,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void getComments_EmptyList_ReturnsEmpty() {
+    public void getComments_EmptyList_ReturnsEmpty() {
         Item item = new Item();
         item.setId(10L);
 
@@ -205,7 +205,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void getComments_WithComments_ReturnsMapped() {
+    public void getComments_WithComments_ReturnsMapped() {
         Item item = new Item();
         item.setId(10L);
 
@@ -229,7 +229,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void getAllItems_WithBookings_SetsLastAndNextBooking() {
+    public void getAllItems_WithBookings_SetsLastAndNextBooking() {
         User owner = new User();
         owner.setId(1L);
 
@@ -272,7 +272,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void getAllItems_WithoutBookings_SetsNullBookings() {
+    public void getAllItems_WithoutBookings_SetsNullBookings() {
         User owner = new User();
         owner.setId(1L);
 
@@ -300,7 +300,7 @@ class ItemServiceUnitTest {
 
 
     @Test
-    void search_WithText_ReturnsMappedItems() {
+    public void search_WithText_ReturnsMappedItems() {
         Item item = new Item();
         item.setId(10L);
         item.setName("Дрель");
@@ -319,7 +319,7 @@ class ItemServiceUnitTest {
 
 
     @Test
-    void updateItem_NotOwner_ThrowsException() {
+    public void updateItem_NotOwner_ThrowsException() {
         User owner = new User();
         owner.setId(2L);
 
@@ -342,7 +342,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void deleteItem_NotOwner_ThrowsException() {
+    public void deleteItem_NotOwner_ThrowsException() {
         User owner = new User();
         owner.setId(2L);
 

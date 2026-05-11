@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ItemValidatorTest {
+public class ItemValidatorTest {
 
     @Mock
     private ValidationUtils validationUtils;
@@ -29,7 +29,7 @@ class ItemValidatorTest {
     private ItemValidator itemValidator;
 
     @Test
-    void validateItemAccess_Success() {
+    public void validateItemAccess_Success() {
         User owner = new User();
         owner.setId(1L);
         Item item = new Item();
@@ -44,7 +44,7 @@ class ItemValidatorTest {
     }
 
     @Test
-    void validateItemAccess_NotOwner_ThrowsException() {
+    public void validateItemAccess_NotOwner_ThrowsException() {
         User owner = new User();
         owner.setId(1L);
         Item item = new Item();
@@ -59,7 +59,7 @@ class ItemValidatorTest {
     }
 
     @Test
-    void validateCommentCreation_Success() {
+    public void validateCommentCreation_Success() {
         Long userId = 1L;
         Long itemId = 10L;
 
@@ -82,7 +82,7 @@ class ItemValidatorTest {
     }
 
     @Test
-    void validateCommentCreation_NoApprovedBooking_ThrowsException() {
+    public void validateCommentCreation_NoApprovedBooking_ThrowsException() {
         Long userId = 1L;
         Long itemId = 10L;
 
@@ -107,7 +107,7 @@ class ItemValidatorTest {
     }
 
     @Test
-    void validateCommentCreation_UserNotFound_ThrowsException() {
+    public void validateCommentCreation_UserNotFound_ThrowsException() {
         Long userId = 1L;
         Long itemId = 10L;
 
@@ -122,7 +122,7 @@ class ItemValidatorTest {
     }
 
     @Test
-    void validateCommentCreation_ItemNotFound_ThrowsException() {
+    public void validateCommentCreation_ItemNotFound_ThrowsException() {
         Long userId = 1L;
         Long itemId = 10L;
 

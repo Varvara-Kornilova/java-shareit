@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BookingStateTest {
+public class BookingStateTest {
 
     @ParameterizedTest
     @CsvSource({
@@ -20,20 +20,20 @@ class BookingStateTest {
             "waiting, WAITING",
             "REJECTED, REJECTED"
     })
-    void from_ValidString_ReturnsState(String input, BookingState expected) {
+    public void from_ValidString_ReturnsState(String input, BookingState expected) {
         Optional<BookingState> result = BookingState.from(input);
         assertTrue(result.isPresent());
         assertEquals(expected, result.get());
     }
 
     @Test
-    void from_InvalidString_ReturnsEmpty() {
+    public void from_InvalidString_ReturnsEmpty() {
         Optional<BookingState> result = BookingState.from("INVALID");
         assertFalse(result.isPresent());
     }
 
     @Test
-    void from_Null_ReturnsEmpty() {
+    public void from_Null_ReturnsEmpty() {
         Optional<BookingState> result = BookingState.from(null);
         assertFalse(result.isPresent());
     }

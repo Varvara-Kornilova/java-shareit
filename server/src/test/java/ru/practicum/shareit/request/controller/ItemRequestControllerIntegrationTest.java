@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class ItemRequestControllerIntegrationTest {
+public class ItemRequestControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -39,7 +39,7 @@ class ItemRequestControllerIntegrationTest {
     private final long requestId = 10L;
 
     @Test
-    void createRequest_Success() throws Exception {
+    public void createRequest_Success() throws Exception {
         ItemRequestCreateDto createDto = new ItemRequestCreateDto("Нужна дрель");
         ItemRequestResponseDto response = new ItemRequestResponseDto(
                 requestId, "Нужна дрель", LocalDateTime.now(), List.of());
@@ -59,7 +59,7 @@ class ItemRequestControllerIntegrationTest {
     }
 
     @Test
-    void getUserRequests_Success() throws Exception {
+    public void getUserRequests_Success() throws Exception {
         ItemRequestResponseDto request = new ItemRequestResponseDto(
                 requestId, "Запрос", LocalDateTime.now(), List.of());
 
@@ -75,7 +75,7 @@ class ItemRequestControllerIntegrationTest {
     }
 
     @Test
-    void getAllRequests_Success() throws Exception {
+    public void getAllRequests_Success() throws Exception {
         ItemRequestResponseDto request = new ItemRequestResponseDto(
                 requestId, "Чужой запрос", LocalDateTime.now(), List.of());
 
@@ -91,7 +91,7 @@ class ItemRequestControllerIntegrationTest {
     }
 
     @Test
-    void getRequestById_Success() throws Exception {
+    public void getRequestById_Success() throws Exception {
         ItemRequestResponseDto response = new ItemRequestResponseDto(
                 requestId, "Запрос", LocalDateTime.now(), List.of());
 
@@ -107,7 +107,7 @@ class ItemRequestControllerIntegrationTest {
     }
 
     @Test
-    void getRequestById_NotFound_ThrowsException() throws Exception {
+    public void getRequestById_NotFound_ThrowsException() throws Exception {
         when(itemRequestService.getRequestById(eq(requestId), eq(userId)))
                 .thenThrow(new NotFoundException("Запрос не найден"));
 

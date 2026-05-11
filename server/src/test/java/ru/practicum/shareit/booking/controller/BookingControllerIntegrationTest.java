@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class BookingControllerIntegrationTest {
+public class BookingControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,7 +43,7 @@ class BookingControllerIntegrationTest {
     private final long itemId = 100L;
 
     @Test
-    void createBooking_Success() throws Exception {
+    public void createBooking_Success() throws Exception {
         BookingCreateDto request = new BookingCreateDto(itemId,
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(2));
@@ -68,7 +68,7 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void updateBookingStatus_Approve_Success() throws Exception {
+    public void updateBookingStatus_Approve_Success() throws Exception {
         BookingResponseDto response = new BookingResponseDto(bookingId, null, null,
                 BookingStatus.APPROVED, null, null);
 
@@ -83,7 +83,7 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void updateBookingStatus_Reject_Success() throws Exception {
+    public void updateBookingStatus_Reject_Success() throws Exception {
         BookingResponseDto response = new BookingResponseDto(bookingId, null, null,
                 BookingStatus.REJECTED, null, null);
 
@@ -98,7 +98,7 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void getBooking_AsBooker_Success() throws Exception {
+    public void getBooking_AsBooker_Success() throws Exception {
         BookingResponseDto response = new BookingResponseDto(bookingId, null, null,
                 BookingStatus.WAITING, null, new BookingResponseDto.BookerDto(userId, "Booker"));
 
@@ -111,7 +111,7 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void getBooking_AccessDenied_ThrowsException() throws Exception {
+    public void getBooking_AccessDenied_ThrowsException() throws Exception {
         when(bookingService.getBooking(eq(userId), eq(bookingId)))
                 .thenThrow(new AccessDeniedException("Доступ запрещен"));
 
@@ -121,7 +121,7 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void getAllBookingsByBooker_WithStateFilter() throws Exception {
+    public void getAllBookingsByBooker_WithStateFilter() throws Exception {
         when(bookingService.getAllBookingsByBooker(eq(userId), eq(BookingState.FUTURE), eq(0), eq(10)))
                 .thenReturn(List.of());
 
@@ -134,8 +134,7 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void getAllBookingsByBooker_InvalidState_ThrowsException() throws Exception {
-        // Контроллер сам бросает IllegalArgumentException → 400 Bad Request
+    public void getAllBookingsByBooker_InvalidState_ThrowsException() throws Exception {
         mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", userId)
                         .param("state", "INVALID_STATE"))
@@ -143,7 +142,7 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void getAllBookingsByOwner_WithAllStates() throws Exception {
+    public void getAllBookingsByOwner_WithAllStates() throws Exception {
         for (BookingState state : BookingState.values()) {
             when(bookingService.getAllBookingsByOwner(eq(userId), eq(state), eq(0), eq(10)))
                     .thenReturn(List.of());

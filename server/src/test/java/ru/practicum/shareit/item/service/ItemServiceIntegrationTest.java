@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class ItemServiceIntegrationTest {
+public class ItemServiceIntegrationTest {
 
     @Autowired
     private ItemService itemService;
@@ -46,7 +46,7 @@ class ItemServiceIntegrationTest {
     private UserRepository userRepository;
 
     @Test
-    void addItem_WithValidRequestId_Success() {
+    public void addItem_WithValidRequestId_Success() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto requester = userService.addUser(new UserDto(null, "Requester", "req@test.com"));
 
@@ -63,7 +63,7 @@ class ItemServiceIntegrationTest {
     }
 
     @Test
-    void addItem_WithInvalidRequestId_ThrowsException() {
+    public void addItem_WithInvalidRequestId_ThrowsException() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         ItemDto newItem = new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), 999L);
 
@@ -72,7 +72,7 @@ class ItemServiceIntegrationTest {
     }
 
     @Test
-    void addComment_AfterApprovedBooking_Success() {
+    public void addComment_AfterApprovedBooking_Success() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto booker = userService.addUser(new UserDto(null, "Booker", "booker@test.com"));
 
@@ -97,7 +97,7 @@ class ItemServiceIntegrationTest {
     }
 
     @Test
-    void addComment_WithoutApprovedBooking_ThrowsException() {
+    public void addComment_WithoutApprovedBooking_ThrowsException() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         UserDto other = userService.addUser(new UserDto(null, "Other", "other@test.com"));
 
@@ -111,7 +111,7 @@ class ItemServiceIntegrationTest {
     }
 
     @Test
-    void getItemById_WithComments_ReturnsComments() {
+    public void getItemById_WithComments_ReturnsComments() {
         UserDto owner = userService.addUser(new UserDto(null, "Owner", "owner@test.com"));
         ItemDto item = itemService.addItem(owner.getId(),
                 new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), null));

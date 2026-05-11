@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CommentMapperTest {
+public class CommentMapperTest {
 
     @Test
-    void toComment_MapsAllFields() {
+    public void toComment_MapsAllFields() {
         CommentCreateDto dto = new CommentCreateDto("Отличный товар!");
         Item item = new Item();
         item.setId(10L);
@@ -32,7 +32,7 @@ class CommentMapperTest {
     }
 
     @Test
-    void toCommentDto_MapsAllFields() {
+    public void toCommentDto_MapsAllFields() {
         Comment comment = new Comment();
         comment.setId(1L);
         comment.setText("Коммент");

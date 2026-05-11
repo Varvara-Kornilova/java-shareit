@@ -7,10 +7,10 @@ import ru.practicum.shareit.user.model.User;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserMapperTest {
+public class UserMapperTest {
 
     @Test
-    void toUserDto_MapsAllFields() {
+    public void toUserDto_MapsAllFields() {
         User user = new User();
         user.setId(1L);
         user.setName("Иван");
@@ -24,7 +24,7 @@ class UserMapperTest {
     }
 
     @Test
-    void toUser_FromUserDto() {
+    public void toUser_FromUserDto() {
         UserDto dto = new UserDto(null, "Иван", "ivan@test.com");
 
         User user = UserMapper.toUser(dto);
@@ -35,7 +35,7 @@ class UserMapperTest {
     }
 
     @Test
-    void toUserUpdateDto_MapsAllFields() {
+    public void toUserUpdateDto_MapsAllFields() {
         User user = new User();
         user.setId(1L);
         user.setName("Иван");
@@ -49,7 +49,7 @@ class UserMapperTest {
     }
 
     @Test
-    void toUser_FromUserUpdateDto() {
+    public void toUser_FromUserUpdateDto() {
         UserUpdateDto updateDto = new UserUpdateDto(1L, "Иван", "ivan@test.com");
 
         User user = UserMapper.toUser(updateDto);

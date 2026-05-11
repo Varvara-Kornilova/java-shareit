@@ -22,19 +22,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = ItemRequestController.class)
-class ItemRequestControllerMvcTest {
+public class ItemRequestControllerMvcTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private ItemRequestClient itemRequestClient;  // ✅ Мокаем клиент
+    private ItemRequestClient itemRequestClient;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void createRequest_ShouldReturn200() throws Exception {
+    public void createRequest_ShouldReturn200() throws Exception {
         ItemRequestCreateDto createDto = new ItemRequestCreateDto("Нужна дрель");
         ItemRequestResponseDto responseDto = new ItemRequestResponseDto(1L, "Нужна дрель", LocalDateTime.now(), List.of());
 
@@ -51,7 +51,7 @@ class ItemRequestControllerMvcTest {
     }
 
     @Test
-    void getUserRequests_ShouldReturnList() throws Exception {
+    public void getUserRequests_ShouldReturnList() throws Exception {
         when(itemRequestClient.getUserRequests(eq(1L)))
                 .thenReturn(ResponseEntity.ok(List.of()));
 
@@ -63,7 +63,7 @@ class ItemRequestControllerMvcTest {
     }
 
     @Test
-    void getAllRequests_ShouldReturnList() throws Exception {
+    public void getAllRequests_ShouldReturnList() throws Exception {
         when(itemRequestClient.getAllRequests(eq(1L)))
                 .thenReturn(ResponseEntity.ok(List.of()));
 

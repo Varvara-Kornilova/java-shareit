@@ -19,19 +19,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = UserController.class)
-class UserControllerMvcTest {
+public class UserControllerMvcTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private UserClient userClient;  // ✅ Мокаем клиент
+    private UserClient userClient;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void addUser_WithValidData_ShouldReturn200() throws Exception {
+    public void addUser_WithValidData_ShouldReturn200() throws Exception {
         UserDto newUser = new UserDto(null, "Test User", "test@test.com");
         UserDto created = new UserDto(1L, "Test User", "test@test.com");
 
@@ -48,7 +48,7 @@ class UserControllerMvcTest {
     }
 
     @Test
-    void addUser_WithInvalidEmail_ShouldReturn400() throws Exception {
+    public void addUser_WithInvalidEmail_ShouldReturn400() throws Exception {
         UserDto invalidUser = new UserDto(null, "Test", "invalid-email");
 
         mockMvc.perform(post("/users")
@@ -58,7 +58,7 @@ class UserControllerMvcTest {
     }
 
     @Test
-    void addUser_WithDuplicateEmail_ShouldReturn409() throws Exception {
+    public void addUser_WithDuplicateEmail_ShouldReturn409() throws Exception {
         UserDto existingUser = new UserDto(1L, "Existing", "dup@test.com");
         UserDto newUser = new UserDto(null, "New", "dup@test.com");
 
@@ -79,7 +79,7 @@ class UserControllerMvcTest {
     }
 
     @Test
-    void updateUser_PartialUpdate_ShouldReturn200() throws Exception {
+    public void updateUser_PartialUpdate_ShouldReturn200() throws Exception {
         UserUpdateDto updateDto = new UserUpdateDto(1L, "New Name", null);
         UserUpdateDto updated = new UserUpdateDto(1L, "New Name", "old@test.com");
 

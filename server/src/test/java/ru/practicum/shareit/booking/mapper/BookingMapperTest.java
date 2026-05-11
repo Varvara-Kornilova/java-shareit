@@ -13,10 +13,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BookingMapperTest {
+public class BookingMapperTest {
 
     @Test
-    void toBooking_MapsFields() {
+    public void toBooking_MapsFields() {
         BookingCreateDto dto = new BookingCreateDto(10L,
                 LocalDateTime.of(2024, 6, 1, 10, 0),
                 LocalDateTime.of(2024, 6, 5, 18, 0));
@@ -25,11 +25,11 @@ class BookingMapperTest {
 
         assertEquals(dto.getStart(), result.getStart());
         assertEquals(dto.getEnd(), result.getEnd());
-        assertNull(result.getItem()); // item устанавливается в сервисе
+        assertNull(result.getItem());
     }
 
     @Test
-    void toBookingResponseDto_MapsAllFields() {
+    public void toBookingResponseDto_MapsAllFields() {
         Booking booking = new Booking();
         booking.setId(100L);
         booking.setStart(LocalDateTime.of(2024, 6, 1, 10, 0));
@@ -55,13 +55,13 @@ class BookingMapperTest {
     }
 
     @Test
-    void toResponseDtoList_EmptyList_ReturnsEmpty() {
+    public void toResponseDtoList_EmptyList_ReturnsEmpty() {
         List<BookingResponseDto> result = BookingMapper.toResponseDtoList(List.of());
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void toResponseDtoList_MultipleBookings_MapsAll() {
+    public void toResponseDtoList_MultipleBookings_MapsAll() {
         Booking b1 = new Booking();
         b1.setId(1L);
         b1.setStatus(BookingStatus.WAITING);

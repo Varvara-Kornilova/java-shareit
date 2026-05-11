@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceUnitTest {
+public class UserServiceUnitTest {
 
     @Mock
     private UserRepository repository;
@@ -27,7 +27,7 @@ class UserServiceUnitTest {
     private UserServiceImpl userService;
 
     @Test
-    void updateUser_OnlyNameChanged_EmailUnchanged() {
+    public void updateUser_OnlyNameChanged_EmailUnchanged() {
         User existing = new User();
         existing.setId(1L);
         existing.setName("Old Name");
@@ -46,7 +46,7 @@ class UserServiceUnitTest {
     }
 
     @Test
-    void updateUser_OnlyEmailChanged_NameUnchanged() {
+    public void updateUser_OnlyEmailChanged_NameUnchanged() {
         User existing = new User();
         existing.setId(1L);
         existing.setName("Old Name");
@@ -66,7 +66,7 @@ class UserServiceUnitTest {
     }
 
     @Test
-    void updateUser_EmailChanged_ToSameUser_DoesNotThrow() {
+    public void updateUser_EmailChanged_ToSameUser_DoesNotThrow() {
         User existing = new User();
         existing.setId(1L);
         existing.setName("Имя");
@@ -83,8 +83,7 @@ class UserServiceUnitTest {
     }
 
     @Test
-    void updateUser_EmailChanged_ToOtherUser_ThrowsException() {
-        // Проверяем ветку: новый email уже используется другим пользователем → исключение
+    public void updateUser_EmailChanged_ToOtherUser_ThrowsException() {
         User existing = new User();
         existing.setId(1L);
         existing.setEmail("old@test.com");
@@ -104,7 +103,7 @@ class UserServiceUnitTest {
     }
 
     @Test
-    void deleteUser_NotFound_ThrowsException() {
+    public void deleteUser_NotFound_ThrowsException() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
         NotFoundException ex = assertThrows(NotFoundException.class,

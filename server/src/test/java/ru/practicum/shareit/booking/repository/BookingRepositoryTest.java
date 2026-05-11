@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-class BookingRepositoryTest {
+public class BookingRepositoryTest {
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -36,7 +36,7 @@ class BookingRepositoryTest {
     private LocalDateTime now;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         now = LocalDateTime.now();
 
         booker = new User();
@@ -59,7 +59,7 @@ class BookingRepositoryTest {
 
 
     @Test
-    void hasApprovedPastBooking_ReturnsTrue_WhenApprovedBookingExists() {
+    public void hasApprovedPastBooking_ReturnsTrue_WhenApprovedBookingExists() {
         Booking booking = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         bookingRepository.save(booking);
@@ -71,7 +71,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void hasApprovedPastBooking_ReturnsFalse_WhenStatusIsNotApproved() {
+    public void hasApprovedPastBooking_ReturnsFalse_WhenStatusIsNotApproved() {
         Booking booking = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.WAITING);
         bookingRepository.save(booking);
@@ -83,7 +83,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void hasApprovedPastBooking_ReturnsFalse_WhenBookingIsFuture() {
+    public void hasApprovedPastBooking_ReturnsFalse_WhenBookingIsFuture() {
         Booking booking = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
         bookingRepository.save(booking);
@@ -96,7 +96,7 @@ class BookingRepositoryTest {
 
 
     @Test
-    void findNextBookingByItemIdAndStatusAfterNow_ReturnsNearestFutureBooking() {
+    public void findNextBookingByItemIdAndStatusAfterNow_ReturnsNearestFutureBooking() {
         Booking first = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(7), BookingStatus.APPROVED);
         Booking second = createBooking(booker, item,
@@ -111,7 +111,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findNextBookingByItemIdAndStatusAfterNow_ReturnsEmpty_WhenNoFutureBookings() {
+    public void findNextBookingByItemIdAndStatusAfterNow_ReturnsEmpty_WhenNoFutureBookings() {
         Booking past = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         bookingRepository.save(past);
@@ -124,7 +124,7 @@ class BookingRepositoryTest {
 
 
     @Test
-    void findLastBookingByItemIdAndStatusBeforeNow_ReturnsNearestPastBooking() {
+    public void findLastBookingByItemIdAndStatusBeforeNow_ReturnsNearestPastBooking() {
         Booking first = createBooking(booker, item,
                 now.minusDays(15), now.minusDays(10), BookingStatus.APPROVED);
         Booking second = createBooking(booker, item,
@@ -140,7 +140,7 @@ class BookingRepositoryTest {
 
 
     @Test
-    void findByBookerIdAndState_Future_ReturnsOnlyFutureBookings() {
+    public void findByBookerIdAndState_Future_ReturnsOnlyFutureBookings() {
         Booking past = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         Booking future = createBooking(booker, item,
@@ -156,7 +156,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByBookerIdAndState_Past_ReturnsOnlyPastBookings() {
+    public void findByBookerIdAndState_Past_ReturnsOnlyPastBookings() {
         Booking past = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         Booking future = createBooking(booker, item,
@@ -172,7 +172,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByBookerIdAndState_Current_ReturnsOnlyCurrentBookings() {
+    public void findByBookerIdAndState_Current_ReturnsOnlyCurrentBookings() {
         Booking current = createBooking(booker, item,
                 now.minusDays(2), now.plusDays(2), BookingStatus.APPROVED);
         Booking past = createBooking(booker, item,
@@ -187,7 +187,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByBookerIdAndState_All_ReturnsAllBookingsSortedByStartDesc() {
+    public void findByBookerIdAndState_All_ReturnsAllBookingsSortedByStartDesc() {
         Booking first = createBooking(booker, item,
                 now.minusDays(5), now.minusDays(2), BookingStatus.APPROVED);
         Booking second = createBooking(booker, item,
@@ -203,7 +203,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByBookerIdAndState_Waiting_ReturnsOnlyWaitingBookings() {
+    public void findByBookerIdAndState_Waiting_ReturnsOnlyWaitingBookings() {
         Booking waiting = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(10), BookingStatus.WAITING);
         Booking approved = createBooking(booker, item,
@@ -220,7 +220,7 @@ class BookingRepositoryTest {
 
 
     @Test
-    void findByOwnerIdAndState_Future_ReturnsBookingsForOwnerItems() {
+    public void findByOwnerIdAndState_Future_ReturnsBookingsForOwnerItems() {
         Booking booking = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
         bookingRepository.save(booking);
@@ -234,7 +234,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsTrue_WhenExists() {
+    public void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsTrue_WhenExists() {
         Booking booking = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         bookingRepository.save(booking);
@@ -246,7 +246,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsFalse_WhenNotExists() {
+    public void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsFalse_WhenNotExists() {
         Booking booking = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.WAITING);
         bookingRepository.save(booking);
@@ -270,10 +270,8 @@ class BookingRepositoryTest {
         return booking;
     }
 
-    // ==================== Тесты для состояния REJECTED ====================
-
     @Test
-    void findByBookerIdAndState_Rejected_ReturnsOnlyRejectedBookings() {
+    public void findByBookerIdAndState_Rejected_ReturnsOnlyRejectedBookings() {
         Booking rejected = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(10), BookingStatus.REJECTED);
         Booking approved = createBooking(booker, item,
@@ -288,17 +286,15 @@ class BookingRepositoryTest {
         assertEquals(BookingStatus.REJECTED, result.get(0).getStatus());
     }
 
-// ==================== Тесты для пустых результатов ====================
-
     @Test
-    void findByBookerIdAndState_All_ReturnsEmpty_WhenNoBookings() {
+    public void findByBookerIdAndState_All_ReturnsEmpty_WhenNoBookings() {
         List<Booking> result = bookingRepository.findByBookerIdAndState(
                 booker.getId(), BookingState.ALL, now);
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void findByBookerIdAndState_Past_ReturnsEmpty_WhenNoPastBookings() {
+    public void findByBookerIdAndState_Past_ReturnsEmpty_WhenNoPastBookings() {
         Booking future = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
         bookingRepository.save(future);
@@ -308,10 +304,8 @@ class BookingRepositoryTest {
         assertTrue(result.isEmpty());
     }
 
-// ==================== Тесты для findByOwnerIdAndState (все состояния) ====================
-
     @Test
-    void findByOwnerIdAndState_Past_ReturnsBookingsForOwnerItems() {
+    public void findByOwnerIdAndState_Past_ReturnsBookingsForOwnerItems() {
         Booking past = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         bookingRepository.save(past);
@@ -324,7 +318,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerIdAndState_Current_ReturnsBookingsForOwnerItems() {
+    public void findByOwnerIdAndState_Current_ReturnsBookingsForOwnerItems() {
         Booking current = createBooking(booker, item,
                 now.minusDays(2), now.plusDays(2), BookingStatus.APPROVED);
         bookingRepository.save(current);
@@ -337,7 +331,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerIdAndState_All_ReturnsAllBookingsForOwner() {
+    public void findByOwnerIdAndState_All_ReturnsAllBookingsForOwner() {
         Booking past = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         Booking future = createBooking(booker, item,
@@ -351,7 +345,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerIdAndState_Waiting_ReturnsOnlyWaitingBookings() {
+    public void findByOwnerIdAndState_Waiting_ReturnsOnlyWaitingBookings() {
         Booking waiting = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(10), BookingStatus.WAITING);
         Booking approved = createBooking(booker, item,
@@ -366,7 +360,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerIdAndState_Rejected_ReturnsOnlyRejectedBookings() {
+    public void findByOwnerIdAndState_Rejected_ReturnsOnlyRejectedBookings() {
         Booking rejected = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(10), BookingStatus.REJECTED);
         bookingRepository.save(rejected);
@@ -379,7 +373,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerIdAndState_All_ReturnsEmpty_WhenNoBookingsForOwner() {
+    public void findByOwnerIdAndState_All_ReturnsEmpty_WhenNoBookingsForOwner() {
         // Создаём вещь другого владельца
         User anotherOwner = new User();
         anotherOwner.setEmail("another@test.com");
@@ -404,7 +398,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByBookerIdAndState_WithPageable_ReturnsLimitedResults() {
+    public void findByBookerIdAndState_WithPageable_ReturnsLimitedResults() {
         for (int i = 0; i < 5; i++) {
             Booking booking = createBooking(booker, item,
                     now.plusDays(i), now.plusDays(i + 2), BookingStatus.APPROVED);
@@ -419,7 +413,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerIdAndState_WithPageable_ReturnsLimitedResults() {
+    public void findByOwnerIdAndState_WithPageable_ReturnsLimitedResults() {
         for (int i = 0; i < 5; i++) {
             Booking booking = createBooking(booker, item,
                     now.plusDays(i), now.plusDays(i + 2), BookingStatus.APPROVED);
@@ -434,14 +428,14 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void hasApprovedPastBooking_ReturnsFalse_WhenNoBookingsAtAll() {
+    public void hasApprovedPastBooking_ReturnsFalse_WhenNoBookingsAtAll() {
         boolean result = bookingRepository.hasApprovedPastBooking(
                 999L, 999L, now);
         assertFalse(result);
     }
 
     @Test
-    void hasApprovedPastBooking_ReturnsFalse_WhenBookingEndsExactlyAtNow() {
+    public void hasApprovedPastBooking_ReturnsFalse_WhenBookingEndsExactlyAtNow() {
         LocalDateTime fixedNow = LocalDateTime.of(2024, 6, 1, 12, 0, 0);
 
         Booking booking = createBooking(booker, item,
@@ -455,7 +449,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsFalse_WhenEndEqualsParameter() {
+    public void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsFalse_WhenEndEqualsParameter() {
         LocalDateTime fixedNow = LocalDateTime.of(2024, 6, 1, 12, 0, 0);
 
         Booking booking = createBooking(booker, item,
@@ -469,14 +463,14 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsFalse_WhenNoBookingsAtAll() {
+    public void existsByBookerIdAndItemIdAndEndBeforeAndStatus_ReturnsFalse_WhenNoBookingsAtAll() {
         boolean exists = bookingRepository.existsByBookerIdAndItemIdAndEndBeforeAndStatus(
                 999L, 999L, now, BookingStatus.APPROVED);
         assertFalse(exists);
     }
 
     @Test
-    void findCurrentByBookerId_ReturnsCurrentBookings() {
+    public void findCurrentByBookerId_ReturnsCurrentBookings() {
         Booking current = createBooking(booker, item,
                 now.minusDays(2), now.plusDays(2), BookingStatus.APPROVED);
         Booking past = createBooking(booker, item,
@@ -490,7 +484,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findCurrentByOwnerId_ReturnsCurrentBookings() {
+    public void findCurrentByOwnerId_ReturnsCurrentBookings() {
         Booking current = createBooking(booker, item,
                 now.minusDays(2), now.plusDays(2), BookingStatus.APPROVED);
         bookingRepository.save(current);
@@ -502,7 +496,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findCurrentByBookerId_ReturnsEmpty_WhenNoCurrentBookings() {
+    public void findCurrentByBookerId_ReturnsEmpty_WhenNoCurrentBookings() {
         Booking past = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         Booking future = createBooking(booker, item,
@@ -516,7 +510,7 @@ class BookingRepositoryTest {
 
 
     @Test
-    void findPastByBookerId_ReturnsPastBookings() {
+    public void findPastByBookerId_ReturnsPastBookings() {
         Booking past = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         bookingRepository.save(past);
@@ -528,7 +522,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findPastByOwnerId_ReturnsPastBookings() {
+    public void findPastByOwnerId_ReturnsPastBookings() {
         Booking past = createBooking(booker, item,
                 now.minusDays(10), now.minusDays(5), BookingStatus.APPROVED);
         bookingRepository.save(past);
@@ -541,7 +535,7 @@ class BookingRepositoryTest {
 
 
     @Test
-    void findFutureByBookerId_ReturnsFutureBookings() {
+    public void findFutureByBookerId_ReturnsFutureBookings() {
         Booking future = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
         bookingRepository.save(future);
@@ -553,7 +547,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findFutureByOwnerId_ReturnsFutureBookings() {
+    public void findFutureByOwnerId_ReturnsFutureBookings() {
         Booking future = createBooking(booker, item,
                 now.plusDays(5), now.plusDays(10), BookingStatus.APPROVED);
         bookingRepository.save(future);

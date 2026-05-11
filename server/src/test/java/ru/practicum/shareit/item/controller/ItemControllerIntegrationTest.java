@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class ItemControllerIntegrationTest {
+public class ItemControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,7 +40,7 @@ class ItemControllerIntegrationTest {
     private final long itemId = 10L;
 
     @Test
-    void getAllItems_Success() throws Exception {
+    public void getAllItems_Success() throws Exception {
         when(itemService.getAllItems(eq(userId)))
                 .thenReturn(List.of());
 
@@ -52,7 +52,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void getItemById_Success() throws Exception {
+    public void getItemById_Success() throws Exception {
         ItemDto item = new ItemDto(itemId, "Дрель", "Профессиональная", true, null, null, List.of(), null);
         when(itemService.getItem(eq(itemId))).thenReturn(item);
 
@@ -63,7 +63,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void getItemById_NotFound_ThrowsException() throws Exception {
+    public void getItemById_NotFound_ThrowsException() throws Exception {
         when(itemService.getItem(eq(itemId)))
                 .thenThrow(new NotFoundException("Вещь не найдена"));
 
@@ -72,7 +72,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void search_WithText_Success() throws Exception {
+    public void search_WithText_Success() throws Exception {
         when(itemService.search(eq("дрель")))
                 .thenReturn(List.of());
 
@@ -84,7 +84,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void search_WithBlankText_ReturnsEmpty() throws Exception {
+    public void search_WithBlankText_ReturnsEmpty() throws Exception {
         mockMvc.perform(get("/items/search")
                         .param("text", ""))
                 .andExpect(status().isOk())
@@ -92,14 +92,14 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void search_WithoutText_ReturnsEmpty() throws Exception {
+    public void search_WithoutText_ReturnsEmpty() throws Exception {
         mockMvc.perform(get("/items/search"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
 
     @Test
-    void addItem_Success() throws Exception {
+    public void addItem_Success() throws Exception {
         ItemDto newItem = new ItemDto(null, "Дрель", "Профессиональная", true, null, null, List.of(), null);
         ItemDto created = new ItemDto(itemId, "Дрель", "Профессиональная", true, null, null, List.of(), null);
 
@@ -117,7 +117,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void updateItem_Success() throws Exception {
+    public void updateItem_Success() throws Exception {
         ItemUpdateDto updateDto = new ItemUpdateDto(itemId, "Новое название", "Новое описание", false);
         ItemDto updated = new ItemDto(itemId, "Новое название", "Новое описание", false, null, null, List.of(), null);
 
@@ -133,7 +133,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void updateItem_AccessDenied_ThrowsException() throws Exception {
+    public void updateItem_AccessDenied_ThrowsException() throws Exception {
         ItemUpdateDto updateDto = new ItemUpdateDto(itemId, "Новое название", "Описание", true);
 
         when(itemService.updateItem(eq(userId), eq(itemId), any(ItemUpdateDto.class)))
@@ -147,7 +147,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void deleteItem_Success() throws Exception {
+    public void deleteItem_Success() throws Exception {
         doNothing().when(itemService).deleteItem(eq(userId), eq(itemId));
 
         mockMvc.perform(delete("/items/{itemId}", itemId)
@@ -158,7 +158,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void addComment_Success() throws Exception {
+    public void addComment_Success() throws Exception {
         CommentCreateDto commentDto = new CommentCreateDto("Отличный товар!");
         CommentDto comment = new CommentDto(1L, "Отличный товар!", "User", null);
 
@@ -174,7 +174,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void addComment_ValidationFailed_ThrowsException() throws Exception {
+    public void addComment_ValidationFailed_ThrowsException() throws Exception {
         CommentCreateDto commentDto = new CommentCreateDto("Отличный товар!");
 
         when(itemService.addComment(eq(userId), eq(itemId), any(CommentCreateDto.class)))
@@ -188,7 +188,7 @@ class ItemControllerIntegrationTest {
     }
 
     @Test
-    void getComments_Success() throws Exception {
+    public void getComments_Success() throws Exception {
         when(itemService.getComments(eq(itemId)))
                 .thenReturn(List.of(new CommentDto(1L, "Коммент", "User", null)));
 

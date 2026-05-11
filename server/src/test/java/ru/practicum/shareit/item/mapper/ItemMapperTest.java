@@ -7,10 +7,10 @@ import ru.practicum.shareit.item.model.Item;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ItemMapperTest {
+public class ItemMapperTest {
 
     @Test
-    void toItemDto_MapsAllFields() {
+    public void toItemDto_MapsAllFields() {
         Item item = new Item();
         item.setId(10L);
         item.setName("Дрель");
@@ -29,7 +29,7 @@ class ItemMapperTest {
     }
 
     @Test
-    void toItem_MapsFromItemDto() {
+    public void toItem_MapsFromItemDto() {
         ItemDto dto = new ItemDto(10L, "Дрель", "Описание", false, null, null, null, 5L);
 
         Item item = ItemMapper.toItem(dto);
@@ -42,7 +42,7 @@ class ItemMapperTest {
     }
 
     @Test
-    void toItemUpdateDto_MapsFields() {
+    public void toItemUpdateDto_MapsFields() {
         Item item = new Item();
         item.setId(10L);
         item.setName("Дрель");
@@ -58,7 +58,7 @@ class ItemMapperTest {
     }
 
     @Test
-    void toItem_FromItemUpdateDto() {
+    public void toItem_FromItemUpdateDto() {
         ItemUpdateDto dto = new ItemUpdateDto(10L, "Новое имя", "Новое описание", false);
 
         Item item = ItemMapper.toItem(dto);
