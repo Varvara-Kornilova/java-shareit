@@ -81,16 +81,10 @@ public class ItemDtoJsonTest {
 
     @Test
     public void deserializeItemDto_ShouldMapFromJsonCorrectly() throws Exception {
-        String jsonContent = """
-              {"id": 1,
-              "name": "Дрель",
-              "description": "Мощная дрель",
-              "available": true,
-              "lastBooking": null,
-              "nextBooking": null,
-              "comments": [],
-              "requestId": 5}
-              """;
+        String jsonContent =
+                "{\"id\": 1, \"name\": \"Дрель\", \"description\": \"Мощная дрель\", " +
+                        "\"available\": true, \"lastBooking\": null, \"nextBooking\": null, " +
+                        "\"comments\": [], \"requestId\": 5}";
 
         ItemDto dto = json.parseObject(jsonContent);
 
